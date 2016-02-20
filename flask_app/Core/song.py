@@ -1,4 +1,4 @@
-
+import time
 
 class Song:
     title = None
@@ -14,7 +14,7 @@ class Song:
         self.upvotes = 0
         self.downvotes = 0
 
-        # TODO: initialize time_added
+        self.time_added = time.time()
 
     def score(self):
         """
@@ -23,7 +23,10 @@ class Song:
             downvotes
             time since added
         """
-        return 0 # TODO
+        VOTE_WEIGHT = 1.0
+        TIME_WEIGHT = 1.1
+        time_minutes = (time.time() - self.time_added) / 60.0
+        return (self.upvotes / (float(self.downvotes) + 1.0)) ** VOTE_WEIGHT * time_minutes ** TIME_WEIGHT
 
     def get_json(self):
         result = {}
