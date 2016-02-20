@@ -47,7 +47,6 @@ h1, h2, h3 {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: 100% 350px;
-	z-index: -1;
 	height: 350px;
 	position: relative;
 }
@@ -79,6 +78,7 @@ h1, h2, h3 {
 	bottom: 0;
 	right: 1%;
 	cursor: pointer;
+	z-index: 5;
 }
 .plus_pic {
 	width: 25px;
@@ -93,6 +93,7 @@ h1, h2, h3 {
 
 /* SEARCH MODAL */
 .search_modal {
+	display: none;
 	position: fixed;
 	top: 25%;
 	right: 50%;
