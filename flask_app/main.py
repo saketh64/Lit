@@ -49,6 +49,10 @@ def get_page():
 
     return render_template('guest.html')
 
+@socketio.on('search')
+def handle_search(query):
+    search_results = search_youtube(query)
+    emit_search_results(search_results)
 
 @socketio.on('add')
 def handle_add(message):
