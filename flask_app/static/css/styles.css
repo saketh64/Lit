@@ -105,6 +105,9 @@ h1, h2, h3 {
 	height: 400px;
 	overflow: scroll;
 }
+.search_icon {
+	cursor: pointer;
+}
 .search_results {
 	background-color: #0395d0;
 	width: 100%;

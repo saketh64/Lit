@@ -91,7 +91,7 @@ socket.on('search_results', function (message) {
 
 
 
-$('.search_button').click(function(){
+$('.search_icon').click(function(){
     search($('.search_term').val());
 });
 
