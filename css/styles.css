@@ -113,9 +113,9 @@ h1, h2, h3 {
 }
 input[type="submit"] {
 	height: 20px;
-	width: 10%;
-	background-color: blue;
+	width: 8%;
+	background-color: #0395d0;
 	color: white;
 	border: 0;
-	padding-top: 0;
+	padding: 0 1% 1% 1%;
 }
