@@ -29,7 +29,7 @@ def update_queue_order():
 
 
 
-app = Flask(__name__)
+app = Flask(__name__,static_url_path="/static")
 
 # what is this
 app.config['SECRET_KEY'] = 'sekrit!'
@@ -42,11 +42,12 @@ def hello(name=None):
     return render_template('host.html', name=name)
 '''
 
-@app.route('/guest/')
+@app.route('/')
 def get_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
+    return render_template('index.html')
 
     return render_template('guest.html')
 
