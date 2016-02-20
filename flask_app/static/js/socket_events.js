@@ -25,7 +25,7 @@ function create_search_result(title, id) {
     var title = $("<h5 class = 'search_title' id = " + id  + ">" + title + "</h5>");
 
     var plus_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2'>");
-    var plus = $("<img src='static/img/plus.png' class='add_plus_pic'" + id + "></img>");
+    var plus = $("<img src='static/img/plus.png' class='add_plus_pic' id =" + id + "></img>");
         
     plus_container.append(plus);
 
@@ -64,9 +64,11 @@ function downvote(_url) {
         url: _url
     });
 }
+var urls = [];
 
 socket.on('update_list', function (message) {
     $('.song_container').empty();
+    
     for(var i = 0;i < message.length;i++)
     {
         // TODO: populate queue of songs
@@ -77,16 +79,29 @@ socket.on('update_list', function (message) {
 
 socket.on('search_results', function (message) {
     $('.search_results').empty();
+    urls = [];
     for(var i = 0;i < message.length;i++)
     {
         // TODO: populate search results
         var song = message[i];
+        urls[i] = song["url"]; 
         $('.search_results').append(create_search_result(song["title"], i));
     }
 });
 
-$('.search_button').click(function(){
+
+
+$('.search_icon').click(function(){
     search($('.search_term').val());
 });
 
+$(document).on('click', '.add_plus_pic', function(){
+    var id = $(this).attr("id");
+    var title = $(document.getElementById(id)).text();
 
+    add(title, urls[id]);
+    $('.search_modal').fadeOut(200);
+
+    
+    
+});

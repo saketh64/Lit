@@ -78,7 +78,6 @@ h1, h2, h3 {
 	bottom: 0;
 	right: 1%;
 	cursor: pointer;
-	z-index: 5;
 }
 .plus_pic {
 	width: 25px;
@@ -106,13 +105,18 @@ h1, h2, h3 {
 	height: 400px;
 	overflow: scroll;
 }
+.search_icon {
+	cursor: pointer;
+}
 .search_results {
 	background-color: #0395d0;
 	width: 100%;
+	border-radius: 10px;
 }
 .add_plus_pic {
 	width: 20px;
 	padding-top: 7px;
+	cursor: pointer;
 }
 .search_title {
 	color: white;
@@ -148,4 +152,5 @@ input[type="submit"] {
 }
 .song_title {
 	font-family: 'Sinkin-Sans100Thin';
+	color: black;
 }
