@@ -3,8 +3,8 @@ import threading
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
-from Core import Song, User, Action
-from youtube_search import search_youtube
+
+from Core import Song, User, Action, search_youtube
 
 
 
@@ -71,7 +71,7 @@ def get_host_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
-    return "No host page yet."
+    return render_template("host.html")
 
 
 @app.route('/user')
@@ -79,6 +79,7 @@ def get_user_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
+    threading.Timer(1,emit_update_list).start()
     return render_template('guest.html')
 
 
