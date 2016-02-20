@@ -95,8 +95,8 @@ socket.on('search_results', function (message) {
 
 
 
-$('.search_icon').click(function(){
-    search($('.search_term').val());
+$('.search-icon').click(function(){
+    search($('#search-input input').val());
 });
 
 $(document).on('click', '.add_plus_pic', function(){
@@ -104,7 +104,7 @@ $(document).on('click', '.add_plus_pic', function(){
     var title = $(document.getElementById(id)).text();
 
     add(title, urls[id]);
-    $('.search_modal').fadeOut(200);
+    $('#search-modal').fadeOut(200);
 
 
 
