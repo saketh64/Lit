@@ -70,6 +70,8 @@ def handle_add(message):
             Song(title,url)
         )
         get_user(request.remote_addr).add_song(url)
+        update_queue_order()
+        emit_update_list()
 
 @socketio.on('upvote')
 def handle_upvote(message):

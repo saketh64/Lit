@@ -29,9 +29,20 @@ function downvote(_url) {
     });
 }
 
+socket.on('update_list', function (message) {
+    for(var i = 0;i < message.length;i++)
+    {
+        // TODO: populate queue of songs
+        current_song = message[i];
+        alert(JSON.stringify(current_song));
+    }
+});
+
 socket.on('search_results', function (message) {
     for(var i = 0;i < message.length;i++)
     {
-        
+        // TODO: populate search results
+        current_song = message[i];
+        alert(JSON.stringify(current_song));
     }
 });
