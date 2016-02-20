@@ -10,6 +10,9 @@ from Core import Song, User, Action, search_youtube
 # queue is a list of Song objects, ordered by score
 queue = []
 
+# a Song object, the currently playing song
+now_playing = None
+
 users = []
 
 # IP of the user currently on nowplaying.html
@@ -37,7 +40,15 @@ def get_queue_json():
 
 
 def update_queue_order():
+    global queue, now_playing
     queue.sort(key=lambda song: song.score(), reverse=True)
+
+    if now_playing == None:
+        now_playing = queue[0]
+        if len(queue) >= 2:
+            queue = queue[1:]
+        else:
+            queue = []
 
 
 app = Flask(__name__, static_url_path="/static")
@@ -78,31 +89,8 @@ def get_user_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
-    threading.Timer(1,emit_update_list).start()
+    threading.Timer(1, emit_update_list).start()
     return render_template('guest.html')
-
-
-def nowplaying_send_heartbeat():
-    global heartbeat_response_received
-
-    socketio.emit('heartbeat_to_client', None, broadcast=True)
-    heartbeat_response_received = False
-    threading.Timer(0.5, nowplaying_timeout).start()
-
-
-@socketio.on('heartbeat_to_server')
-def nowplaying_receive_heartbeat(message):
-    global heartbeat_response_received
-
-    heartbeat_response_received = True
-    threading.Timer(0.5, nowplaying_send_heartbeat).start()
-
-
-def nowplaying_timeout():
-    global nowplaying_ip
-    if heartbeat_response_received == False:
-        nowplaying_ip = None
-        print "Now Playing user has disconnected."
 
 
 @socketio.on('search')
@@ -127,6 +115,8 @@ def handle_add(message):
         get_user(request.remote_addr).add_song(url)
         get_user(request.remote_addr).add_action(url, Action.UPVOTE)
         update_queue_order()
+        if now_playing == None:
+            next_song()
         emit_update_list()
 
 
@@ -161,6 +151,49 @@ def handle_downvote(message):
         update_queue_order()
         emit_update_list()
 
+
+######################
+# Events for the Now Playing page
+######################
+def nowplaying_send_heartbeat():
+    global heartbeat_response_received
+
+    socketio.emit('heartbeat_to_client', None, broadcast=True)
+    heartbeat_response_received = False
+    threading.Timer(0.5, nowplaying_timeout).start()
+
+
+@socketio.on('heartbeat_to_server')
+def nowplaying_receive_heartbeat(message):
+    global heartbeat_response_received
+
+    heartbeat_response_received = True
+    threading.Timer(0.5, nowplaying_send_heartbeat).start()
+
+
+def nowplaying_timeout():
+    global nowplaying_ip
+    if heartbeat_response_received == False:
+        nowplaying_ip = None
+        print "Now Playing user has disconnected."
+
+
+@socketio.on('song_end')
+def next_song():
+    global queue, now_playing
+    now_playing = None
+    if len(queue) > 0:
+        now_playing = queue[0]
+        if len(queue) >= 2:
+            queue = queue[1:]
+        else:
+            queue = []
+        socketio.emit('new_song', now_playing.get_json())
+
+
+######################
+# Emitting events to clients
+######################
 
 def emit_update_list():
     socketio.emit('update_list', get_queue_json(), broadcast=True)
