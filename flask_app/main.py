@@ -2,6 +2,7 @@ from flask import Flask, render_template,request
 from flask_socketio import SocketIO
 
 from Core import Song,User,Action
+from youtube_search import search_youtube
 
 
 # queue is a list of Song objects, ordered by score
@@ -50,8 +51,8 @@ def get_page():
     return render_template('guest.html')
 
 @socketio.on('search')
-def handle_search(query):
-    search_results = search_youtube(query)
+def handle_search(message):
+    search_results = search_youtube(message[u"query"])
     emit_search_results(search_results)
 
 @socketio.on('add')
