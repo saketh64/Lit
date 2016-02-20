@@ -34,10 +34,14 @@
     font-weight: normal;
     font-style: normal;
 }
+body {
+	position: relative;
+}
 h1, h2, h3 {
 	padding: none;
 	margin: none;
 }
+/* HEADER */
 #header {
 	background-image: url("../img/host_user_header_bg1.png");
 	background-repeat: no-repeat;
@@ -87,3 +91,30 @@ h1, h2, h3 {
 	font-family: 'Sinkin-Sans100Thin';
 }
 
+/* SEARCH MODAL */
+.search_modal {
+	position: fixed;
+	top: 25%;
+	right: 50%;
+	transform: translateX(50%);
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 10px;
+	z-index: 10;
+	width: 50%;
+	height: 400px;
+}
+.search_term {
+	width: 75%;
+	margin-left: 7.5%;
+	margin-top: 5%;
+	height: 20px;
+}
+input[type="submit"] {
+	height: 20px;
+	width: 10%;
+	background-color: blue;
+	color: white;
+	border: 0;
+	padding-top: 0;
+}
