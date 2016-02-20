@@ -1,0 +1,47 @@
+<!doctype html>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('connect', function() {
+        // Do nothing
+    });
+
+    function add()
+    {
+      // this is what an 'add' event looks like
+      socket.emit('add', {
+        title: 'a cool song title',
+        url: 'http://someurl.com',
+      });
+    }
+
+    function search()
+    {
+      // this is what a search event looks like
+      socket.emit('search', {
+        query: 'some cool song and artist'
+      });
+    }
+
+    function upvote()
+    {
+      // this is what an upvote event looks like
+      socket.emit('upvote', {
+        url: 'http://someurl.com'
+      });
+    }
+
+    function downvote()
+    {
+            // this is what a downvote event looks like
+            socket.emit('downvote', {
+              url: 'http://someurl.com'
+            });
+    }
+</script>
+<title>Lit</title>
+<input type="button" onclick="add()" value="Add" />
+<input type="button" onclick="search()" value="Search" />
+<input type="button" onclick="upvote()" value="Upvote" />
+<input type="button" onclick="downvote()" value="Downvote" />
