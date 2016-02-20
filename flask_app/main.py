@@ -1,5 +1,6 @@
 from flask import Flask, render_template,request
 from flask_socketio import SocketIO
+import threading
 
 from Core import Song,User,Action
 from youtube_search import search_youtube
@@ -9,6 +10,13 @@ from youtube_search import search_youtube
 queue = []
 
 users = []
+
+# IP of the user currently on nowplaying.html
+# We only allow one user at a time, because this page plays audio
+# We'll track connections with a heartbeat
+nowplaying_ip = None
+
+heartbeat_response_received = False
 
 def get_user(ip):
     for user in users:
@@ -49,12 +57,41 @@ def get_guest_page():
         users.append(connected_user)
     return render_template('index.html')
 
+
+def nowplaying_send_heartbeat():
+    global heartbeat_response_received
+
+    socketio.emit('heartbeat_to_client', None, broadcast=True)
+    heartbeat_response_received = False
+    threading.Timer(3, nowplaying_timeout).start()
+
+@socketio.on('heartbeat_to_server')
+def nowplaying_receive_heartbeat(message):
+    global heartbeat_response_received
+
+    heartbeat_response_received = True
+    threading.Timer(3,nowplaying_send_heartbeat).start()
+
+
+def nowplaying_timeout():
+    global nowplaying_ip
+    if heartbeat_response_received == False:
+        nowplaying_ip = None
+        print "Now Playing user has disconnected."
+
+
+
 @app.route('/nowplaying')
-def get_nowplaying_page()
-    #connected_user = User(request.remote_addr)
-    #if get_user(connected_user) is None:
-    #    users.append(connected_user)
-    return render_template('nowplaying.html')
+def get_nowplaying_page():
+    global nowplaying_ip
+    if nowplaying_ip == None:
+        nowplaying_ip = User(request.remote_addr)
+        threading.Timer(3,nowplaying_send_heartbeat).start()
+        return render_template('nowplaying.html')
+    else:
+        print "Someone tried to connect to nowplaying.html, but there's already a connection."
+        return "Can't connect - there is already a user on the Now Playing screen."
+
 
 @socketio.on('search')
 def handle_search(message):
