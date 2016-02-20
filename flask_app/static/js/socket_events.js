@@ -7,8 +7,8 @@ function create_song(title) {
     var title = $("<h5 class = 'song_title'>" + title + "</h5>");
 
     var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
-    var upvote_button = $("<img src='static/img/up_arrow_black.png' class='vote_button'></img>");
-    var downvote_button = $("<img src='static/img/down_arrow_black.png' class='vote_button'></img>");
+    var upvote_button = $("<img src='static/img/up_arrow_black.png' class='vote_button' onmouseover='hoverUpvote(this);' onmouseout='unhoverUpvote(this);'></img>");
+    var downvote_button = $("<img src='static/img/down_arrow_black.png' class='vote_button' onmouseover='hoverDownvote(this);' onmouseout='unhoverDownvote(this);'></img>");
 
 
     votes_container.append(upvote_button).append(downvote_button);
@@ -109,3 +109,17 @@ $(document).on('click', '.add_plus_pic', function(){
 
 
 });
+
+
+function hoverUpvote(element) {
+    element.setAttribute('src', 'static/img/up_arrow_blue.png');
+}
+function unhoverUpvote(element) {
+    element.setAttribute('src', 'static/img/up_arrow_black.png');
+}
+function hoverDownvote(element) {
+    element.setAttribute('src', 'static/img/down_arrow_blue.png');
+}
+function unhoverDownvote(element) {
+    element.setAttribute('src', 'static/img/down_arrow_black.png');
+}
