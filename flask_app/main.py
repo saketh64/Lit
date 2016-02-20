@@ -79,6 +79,7 @@ def get_user_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
+    threading.Timer(1,emit_update_list).start()
     return render_template('guest.html')
 
 
