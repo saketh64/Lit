@@ -51,6 +51,73 @@ h1, h2, h3 {
 	position: relative;
     padding: 10px 30px 0px 0px;
 }
+
+/* INDEX */
+#index-header {
+    background-image: url("../img/index_header_bg.png");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100% 550px;
+	height: 550px;
+	position: relative;
+    padding: 10px 30px 0px 0px;
+    text-align: center;
+}
+.index-title {
+    display: inline-block;
+    font-family: 'Sinkin-Sans100Thin';
+    font-size: 190px;
+	color: white;
+}
+.index-logo {
+    display: inline-block;
+    vertical-align: top;
+    width: 95px;
+    margin-top: 16px;
+    margin-right: 40px;
+}
+.index-logo-title {
+    position: relative;
+    top: 50px;
+    margin: auto;
+}
+.index-nav {
+    position: relative;
+    top: 150px;
+    margin: auto;
+}
+.index-button, .index-button:link, .index-button:visited {
+    background-color: transparent;
+    border-radius: 0;
+    color: #fff;
+    font-family: 'Sinkin-Sans300Light';
+    border: 2px solid #fff !important;
+    width: 150px;
+    margin: 0px 80px 0px 100px
+}
+.index-button:active, .index-button:hover {
+    background-color: #0395d0;
+    border: 2px solid #0395d0 !important;
+    color: #fff
+}
+#index-body {
+    position: relative;
+    margin: 50px 20% 50px 20%
+}
+#index-body h2 {
+    font-family: 'Sinkin-Sans200XLight';
+}
+#index-body hr {
+    width: 30%;
+    height: 2px;
+    background-image: linear-gradient(to right, rgba(3, 149, 208, 0), rgba(3, 149, 208, 0.75), rgba(3, 149, 208, 0));
+    margin: 40px auto;
+}
+#index-body p {
+    font-family: 'Sinkin-Sans300Light';
+}
+/* /INDEX */
+
 .site_title {
 	font-family: 'Sinkin-Sans100Thin';
     font-size: 40px;
