@@ -1,0 +1,134 @@
+@font-face {
+    font-family: 'Sinkin-Sans400Reg';
+    src: url('fonts/SinkinSans-400Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans100Thin';
+    src: url('fonts/SinkinSans-100Thin.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans100ThinItalic';
+    src: url('fonts/SinkinSans-100ThinItalic.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans200XLight';
+    src: url('fonts/SinkinSans-200XLight.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans300Light';
+    src: url('fonts/SinkinSans-300Light.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans400Italic';
+    src: url('fonts/SinkinSans-400Italic.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+body {
+	position: relative;
+}
+h1, h2, h3 {
+	padding: none;
+	margin: none;
+}
+/* HEADER */
+#header {
+	background-image: url("../img/host_user_header_bg1.png");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100% 350px;
+	height: 350px;
+	position: relative;
+}
+.site_title {
+	font-family: 'Sinkin-Sans100Thin';
+	color: white;
+	float: right;
+}
+.logo {
+	width: 25px;
+	float: right;
+	margin-top: 7px;
+	margin-right: 10px;
+}
+.current_song_container {
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	text-align: center;
+	overflow: auto;
+}
+.current_song_title {
+	font-family: 'Sinkin-Sans100Thin';
+	color: white;
+}
+.add_song_button {
+	position: absolute;
+	bottom: 0;
+	right: 1%;
+	cursor: pointer;
+	z-index: 5;
+}
+.plus_pic {
+	width: 25px;
+	float: left;
+	margin: 5px 5px 0 0;
+}
+.plus_text {
+	float: left;
+	color: white;
+	font-family: 'Sinkin-Sans100Thin';
+}
+
+/* SEARCH MODAL */
+.search_modal {
+	display: none;
+	position: fixed;
+	top: 25%;
+	right: 50%;
+	transform: translateX(50%);
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 10px;
+	z-index: 10;
+	width: 50%;
+	height: 400px;
+}
+.search_term {
+	width: 75%;
+	margin-left: 7.5%;
+	margin-top: 5%;
+	height: 20px;
+}
+input[type="submit"] {
+	height: 20px;
+	width: 8%;
+	background-color: #0395d0;
+	color: white;
+	border: 0;
+	padding: 0 1% 1% 1%;
+}
+
+/* SONG QUEUE */
+.song_container {
+	padding-top: 15px;
+}
+.vote_button {
+	display: block;
+	width: 25px;
+}
+.song_title {
+	font-family: 'Sinkin-Sans100Thin';
+
+}
