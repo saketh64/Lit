@@ -109,7 +109,7 @@ h1, h2, h3 {
 }
 #index-body hr {
     width: 30%;
-    height: 2px;
+    height: 1px;
     background-image: linear-gradient(to right, rgba(3, 149, 208, 0), rgba(3, 149, 208, 0.75), rgba(3, 149, 208, 0));
     margin: 40px auto;
 }
@@ -118,6 +118,7 @@ h1, h2, h3 {
 }
 /* /INDEX */
 
+/* HOST GUEST HEADER */
 .site_title {
 	font-family: 'Sinkin-Sans100Thin';
     font-size: 40px;
@@ -161,6 +162,7 @@ h1, h2, h3 {
 	color: white;
 	font-family: 'Sinkin-Sans100Thin';
 }
+/* /HOST GUEST HEADER */
 
 /* SEARCH MODAL */
 .search_modal {

@@ -11,7 +11,7 @@
 <body>
 	<div class = "body_wrapper">
 	<!-- HEADER -->
-	<div class = "container-fluid" id = "header">
+    <div class = "container-fluid" id = "header">
 		<div class = "row">
 			<div class = "col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8">
 				<h3 class = "site_title">Lit</h3>
@@ -19,32 +19,35 @@
 			</div>
 		</div>
 		<div class = "current_song_container">
-				<h1 class = "current_song_title">Title</h1>
+			<h1 class = "current_song_title">Title</h1>
 		</div>
-		<div class = "add_song_button">
-			<img class = "plus_pic" src = "static/img/plus.png">
-			<h4 class = "plus_text">add song</h4>
-		</div>
+        <div class="add_skip_container">
+		    <div class = "add_skip_button">
+			    <img class = "add_skip_pic" src = "static/img/plus.png">
+			    <h4 class = "add_skip_text">add song</h4>
+		    </div>
+        </div>
 	</div>
 
 	<!-- SEARCH MODAL -->
 	<div class = "search_modal">
 		<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		<input type = "text" name = "search_term" class = "search_term">
-		<input type = "submit" name = "search_button" class = "search_button">
+		<img class = "search_icon" src = "static/img/search_icon.svg">
 		<hr>
-		<ul class = "list-unstyled search_results">
-		</ul>
+		<div class = "container-fluid search_results">
+
+		</div>
 	</div>
 
 	<!-- SONG QUEUE -->
 	<div class = "container song_container">
-		
+
 	</div>
 
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	<script src="static/js/script.js"></script>
-  <script src="static/js/socket_events.js"></script>
+    <script src="static/js/socket_events.js"></script>
 	<script src="static/js/bootstrap.min.js"></script>
 </body>
