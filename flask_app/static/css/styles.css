@@ -219,7 +219,7 @@ input[type="submit"] {
 /* SONG QUEUE */
 .song_container {
 	padding-top: 15px;
-    margin-left: 25% !important;
+    margin-left: 17% !important;
 }
 .votes-container {
     margin-left: 10% !important;
@@ -232,4 +232,7 @@ input[type="submit"] {
 .song_title {
 	font-family: 'Sinkin-Sans300Light';
 	color: black;
+}
+#song_divider {
+    
 }

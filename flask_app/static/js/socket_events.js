@@ -1,9 +1,10 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 function create_song(title) {
+    var ret = $("<div></div>");
     var result = $("<div class='row'></div>");
     var container = $("<div class = 'col-xs-6 col-sm-6 col-md-5 col-md-offset-2'></div>")
-    var title = $("<h5 class = 'song_title'>" + title + "</h5><hr>");
+    var title = $("<h5 class = 'song_title'>" + title + "</h5>");
 
     var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
     var upvote_button = $("<img src='static/img/up_arrow_black.png' class='vote_button'></img>");
@@ -16,7 +17,10 @@ function create_song(title) {
 
     result.append(container).append(votes_container);
 
-    return result;
+    ret.append(result);
+    ret.append("<hr id='song_divider'>");
+
+    return ret;
 }
 
 function create_search_result(title, id) {
