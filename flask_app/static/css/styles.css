@@ -104,6 +104,7 @@ h1, h2, h3 {
 	z-index: 10;
 	width: 50%;
 	height: 400px;
+	overflow: scroll;
 }
 .search_results {
 	background-color: #0395d0;
