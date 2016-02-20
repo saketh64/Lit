@@ -1,47 +1,53 @@
 <!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lit - Guest</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+</head>
 
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-<script type="text/javascript" charset="utf-8">
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect', function() {
-        // Do nothing
-    });
+<body>
+	<div class = "body_wrapper">
+	<!-- HEADER -->
+    <div class = "container-fluid" id = "header">
+		<div class = "row">
+			<div class = "col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8">
+				<h3 class = "site_title">Lit</h3>
+				<img class = "logo" src = "static/img/logo_trans.png">
+			</div>
+		</div>
+		<div class = "current_song_container">
+			<h1 class = "current_song_title">Title</h1>
+		</div>
+        <div class="add_skip_container">
+		    <div class = "add_skip_button" id = "add_song">
+			    <img class = "add_skip_pic" src = "static/img/plus.png">
+			    <h4 class = "add_skip_text">add song</h4>
+		    </div>
+        </div>
+	</div>
 
-    function add()
-    {
-      // this is what an 'add' event looks like
-      socket.emit('add', {
-        title: 'a cool song title',
-        url: 'http://someurl.com',
-      });
-    }
+	<!-- SEARCH MODAL -->
+	<div class = "search_modal">
+		<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<input type = "text" name = "search_term" class = "search_term">
+		<img class = "search_icon" src = "static/img/search_icon.svg">
+		<hr>
+		<div class = "container-fluid search_results">
 
-    function search()
-    {
-      // this is what a search event looks like
-      socket.emit('search', {
-        query: 'some cool song and artist'
-      });
-    }
+		</div>
+	</div>
 
-    function upvote()
-    {
-      // this is what an upvote event looks like
-      socket.emit('upvote', {
-        url: 'http://someurl.com'
-      });
-    }
+	<!-- SONG QUEUE -->
+	<div class = "container song_container">
 
-    function downvote()
-    {
-            // this is what a downvote event looks like
-            socket.emit('downvote', {
-              url: 'http://someurl.com'
-            });
-    }
-</script>
-<title>Lit</title>
-<input type="button" onclick="add()" value="Add" />
-<input type="button" onclick="search()" value="Search" />
-<input type="button" onclick="upvote()" value="Upvote" />
-<input type="button" onclick="downvote()" value="Downvote" />
+	</div>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="static/js/script.js"></script>
+    <script src="static/js/socket_events.js"></script>
+	<script src="static/js/bootstrap.min.js"></script>
+</body>

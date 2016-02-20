@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 
-	$('.add_song_button').click(function() {
+	$('#add_song').click(function() {
 		$('.search_modal').fadeIn(200);
 	});
 
