@@ -1,0 +1,25 @@
+
+h1, h2, h3 {
+	padding: none;
+	margin: none;
+}
+/* HEADER */
+body {
+	background-image: url("../img/host_user_header_bg1.png");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100%;
+	position: relative;
+}
+
+#play-button {
+	width:20%;
+	height:20%;
+	vertical-align:50%;
+}
+
+#pause-button {
+	width:20%;
+	height:20%;
+	vertical-align:50%;
+}
