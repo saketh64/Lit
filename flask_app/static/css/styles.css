@@ -150,7 +150,6 @@ h1, h2, h3 {
 }
 .add_skip_button {
 	cursor: pointer;
-	z-index: 5;
 }
 .add_skip_pic {
 	width: 20px;
@@ -176,6 +175,24 @@ h1, h2, h3 {
 	z-index: 10;
 	width: 50%;
 	height: 400px;
+	overflow: scroll;
+}
+.search_icon {
+	cursor: pointer;
+}
+.search_results {
+	background-color: #0395d0;
+	width: 100%;
+	border-radius: 10px;
+}
+.add_plus_pic {
+	width: 20px;
+	padding-top: 7px;
+	cursor: pointer;
+}
+.search_title {
+	color: white;
+	font-family: 'Sinkin-Sans100Thin';
 }
 .search_term {
 	width: 75%;
@@ -191,6 +208,11 @@ input[type="submit"] {
 	border: 0;
 	padding: 0 1% 1% 1%;
 }
+@media screen and (max-width: 700px) {
+	.search_modal {
+		width: 100%;
+	}
+}
 
 /* SONG QUEUE */
 .song_container {
@@ -202,5 +224,5 @@ input[type="submit"] {
 }
 .song_title {
 	font-family: 'Sinkin-Sans100Thin';
-
+	color: black;
 }

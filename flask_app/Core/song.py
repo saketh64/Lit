@@ -3,7 +3,7 @@ import time
 class Song:
     title = None
     url = None
-    upvotes = 0
+    upvotes = 1
     downvotes = 0
 
     time_added = None
@@ -11,7 +11,7 @@ class Song:
     def __init__(self,title,url):
         self.title = title
         self.url = url
-        self.upvotes = 0
+        self.upvotes = 1
         self.downvotes = 0
 
         self.time_added = time.time()
