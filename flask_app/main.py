@@ -44,18 +44,42 @@ app.config['SECRET_KEY'] = 'sekrit!'
 
 socketio = SocketIO(app)
 
-'''
-@app.route('/host/')
-def hello(name=None):
-    return render_template('host.html', name=name)
-'''
-
-@app.route('/guest')
-def get_guest_page():
+@app.route('/user')
+def get_user_page():
+    print "here"
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
-    return render_template('index.html')
+    return render_template('guest.html')
+
+
+
+@app.route('/landing')
+def get_landing_page():
+    return "No landing page yet."
+
+
+@app.route('/nowplaying')
+def get_nowplaying_page():
+    global nowplaying_ip
+    if nowplaying_ip == None:
+        nowplaying_ip = User(request.remote_addr)
+        threading.Timer(2,nowplaying_send_heartbeat).start()
+        return render_template('nowplaying.html')
+    else:
+        print "Someone tried to connect to nowplaying.html, but there's already a connection."
+        return "Can't connect - there is already a user on the Now Playing screen."
+
+@app.route('/host')
+def get_host_page():
+    connected_user = User(request.remote_addr)
+    if get_user(connected_user) is None:
+        users.append(connected_user)
+    return "No host page yet."
+
+
+
+
 
 
 def nowplaying_send_heartbeat():
@@ -78,19 +102,6 @@ def nowplaying_timeout():
     if heartbeat_response_received == False:
         nowplaying_ip = None
         print "Now Playing user has disconnected."
-
-
-
-@app.route('/nowplaying')
-def get_nowplaying_page():
-    global nowplaying_ip
-    if nowplaying_ip == None:
-        nowplaying_ip = User(request.remote_addr)
-        threading.Timer(2,nowplaying_send_heartbeat).start()
-        return render_template('nowplaying.html')
-    else:
-        print "Someone tried to connect to nowplaying.html, but there's already a connection."
-        return "Can't connect - there is already a user on the Now Playing screen."
 
 
 @socketio.on('search')
