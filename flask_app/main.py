@@ -46,8 +46,8 @@ def hello(name=None):
 def get_landing_page():
     return render_template('index.html')
 
-@app.route('/guest')
-def get_guest_page():
+@app.route('/user')
+def get_user_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
