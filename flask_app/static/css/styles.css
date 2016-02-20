@@ -222,7 +222,8 @@ input[type="submit"] {
 }
 .vote_button {
 	display: block;
-	width: 25px;
+	width: 20px;
+    margin: 5px 0px
 }
 .song_title {
 	font-family: 'Sinkin-Sans300Light';
