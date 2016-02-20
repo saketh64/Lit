@@ -1,12 +1,18 @@
 from flask import Flask, render_template,request
 from flask_socketio import SocketIO
 
-from Core.song import Song
+from Core import Song,User,Action
 
 
 # queue is a list of Song objects, ordered by score
 queue = []
 
+users = []
+
+def get_user(ip):
+    for user in users:
+        if user.ip_addr == ip:
+            return user
 
 def get_queue_json():
     """
@@ -37,13 +43,15 @@ def hello(name=None):
 
 @app.route('/guest/')
 def get_page():
-    print request.remote_addr
+    connected_user = User(request.remote_addr)
+    if get_user(connected_user) is None:
+        users.append(connected_user)
+
     return render_template('guest.html')
 
 
 @socketio.on('add')
 def handle_add(message):
-    print request.remote_addr
     title=message[u"title"]
     url=message[u"url"]
 
@@ -55,6 +63,7 @@ def handle_add(message):
         queue.append(
             Song(title,url)
         )
+        get_user(request.remote_addr).add_song(url)
 
 @socketio.on('upvote')
 def handle_upvote(message):
@@ -64,8 +73,10 @@ def handle_upvote(message):
     if len(songs_with_url) != 1:
         print "Couldn't upvote."
     else:
-        songs_with_url[0].upvotes += 1
+        upvoted_song = songs_with_url[0]
+        upvoted_song.upvotes += 1
         print "Set '%s' upvotes to %d" % (songs_with_url[0].title,songs_with_url[0].upvotes)
+        get_user(request.remote_addr).add_action(upvoted_song.url,Action.UPVOTE)
         update_queue_order()
         emit_update_list()
 
@@ -77,8 +88,10 @@ def handle_downvote(message):
     if len(songs_with_url) != 1:
         print "Couldn't downvote."
     else:
-        songs_with_url[0].downvotes += 1
+        downvoted_song = songs_with_url[0]
+        downvoted_song.downvotes += 1
         print "Set '%s' downvotes to %d" % (songs_with_url[0].title,songs_with_url[0].downvotes)
+        get_user(request.remote_addr).add_action(downvoted_song.url,Action.DOWNVOTE)
         update_queue_order()
         emit_update_list()
 
