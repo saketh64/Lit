@@ -70,7 +70,7 @@ def get_host_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
-    return "No host page yet."
+    return render_template("host.html")
 
 
 @app.route('/user')
