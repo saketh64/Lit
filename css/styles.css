@@ -1,0 +1,55 @@
+@font-face {
+    font-family: 'Sinkin-Sans400Reg';
+    src: url('fonts/SinkinSans-400Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans100Thin';
+    src: url('fonts/SinkinSans-100Thin.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans100ThinItalic';
+    src: url('fonts/SinkinSans-100ThinItalic.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans200XLight';
+    src: url('fonts/SinkinSans-200XLight.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans300Light';
+    src: url('fonts/SinkinSans-300Light.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Sinkin-Sans400Italic';
+    src: url('fonts/SinkinSans-400Italic.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+h1, h2, h3 {
+	padding: none;
+	margin: none;
+}
+#header {
+	background-color: black;
+}
+.title {
+	font-family: 'Sinkin-Sans100Thin';
+	color: white;
+	float: right;
+
+}
+.logo {
+	width: 25px;
+	float: right;
+	margin-top: 7px;
+	margin-right: 10px;
+}
