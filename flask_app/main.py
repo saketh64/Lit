@@ -18,7 +18,7 @@ def get_queue_json():
     return result
 
 def update_queue_order():
-    queue.sort(key=lambda song: song.score(), reversed=True)
+    queue.sort(key=lambda song: song.score(), reverse=True)
 
 
 

@@ -11,7 +11,7 @@ class User:
 
     def __init__(self, ip_addr):
         self.ip_addr = ip_addr
-        self.activity = []
+        self.activity = {}
         self.added_songs = []
 
     def add_action(self, song_url, action_type):
