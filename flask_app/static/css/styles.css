@@ -105,6 +105,18 @@ h1, h2, h3 {
 	width: 50%;
 	height: 400px;
 }
+.search_results {
+	background-color: #0395d0;
+	width: 100%;
+}
+.add_plus_pic {
+	width: 20px;
+	padding-top: 7px;
+}
+.search_title {
+	color: white;
+	font-family: 'Sinkin-Sans100Thin';
+}
 .search_term {
 	width: 75%;
 	margin-left: 7.5%;
@@ -119,6 +131,11 @@ input[type="submit"] {
 	border: 0;
 	padding: 0 1% 1% 1%;
 }
+@media screen and (max-width: 700px) {
+	.search_modal {
+		width: 100%;
+	}
+}
 
 /* SONG QUEUE */
 .song_container {
@@ -130,5 +147,4 @@ input[type="submit"] {
 }
 .song_title {
 	font-family: 'Sinkin-Sans100Thin';
-
 }
