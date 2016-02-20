@@ -63,14 +63,14 @@ def nowplaying_send_heartbeat():
 
     socketio.emit('heartbeat_to_client', None, broadcast=True)
     heartbeat_response_received = False
-    threading.Timer(3, nowplaying_timeout).start()
+    threading.Timer(0.5, nowplaying_timeout).start()
 
 @socketio.on('heartbeat_to_server')
 def nowplaying_receive_heartbeat(message):
     global heartbeat_response_received
 
     heartbeat_response_received = True
-    threading.Timer(3,nowplaying_send_heartbeat).start()
+    threading.Timer(0.5,nowplaying_send_heartbeat).start()
 
 
 def nowplaying_timeout():
@@ -86,7 +86,7 @@ def get_nowplaying_page():
     global nowplaying_ip
     if nowplaying_ip == None:
         nowplaying_ip = User(request.remote_addr)
-        threading.Timer(3,nowplaying_send_heartbeat).start()
+        threading.Timer(2,nowplaying_send_heartbeat).start()
         return render_template('nowplaying.html')
     else:
         print "Someone tried to connect to nowplaying.html, but there's already a connection."
