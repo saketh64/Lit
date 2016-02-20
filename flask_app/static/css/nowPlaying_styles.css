@@ -12,14 +12,29 @@ body {
 	position: relative;
 }
 
-#play-button {
-	width:20%;
-	height:20%;
+#pause-button {
+	width:200px;
+	height:200px;
 	vertical-align:50%;
+	background-image: url("../img/pause.png");
+	background-size: 100%;
+	display: inline-block;
 }
 
-#pause-button {
-	width:20%;
-	height:20%;
-	vertical-align:50%;
+#pause-button:hover {
+	background-image: url("../img/pause_hover.png");
 }
+
+#play-button {
+	width:200px;
+	height:200px;
+	vertical-align:50%;
+	background-image: url("../img/play.png");
+	background-size: 100%;
+	display: inline-block;
+	}
+
+#play-button:hover {
+	background-image: url("../img/play_hover.png");
+}
+
