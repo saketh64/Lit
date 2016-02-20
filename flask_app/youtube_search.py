@@ -14,9 +14,9 @@ def search_youtube(query):
 	return help_search_youtube(query)
 
 # Replace spaces with '\ '
-def formatQuery(myQuery):
-	myQuery.replace(" ", "\ ")
-	return myQuery
+def format_query(my_query):
+	my_query.replace(" ", "\ ")
+	return my_query
 
 # Sets the developer key
 def set_developer_key():
@@ -30,11 +30,11 @@ def help_search_youtube(query):
 	youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
 
 	# Parse the query
-	formattedQuery = formatQuery(query)
+	formatted_query = format_query(query)
 
 	# Call the search method to retrieve results matching the specified query term
 	search_response = youtube.search().list	(
-		q=formattedQuery,
+		q=formatted_query,
 		part="id,snippet",
 		maxResults=10,
 		type="video"
