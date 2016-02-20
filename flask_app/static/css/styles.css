@@ -219,6 +219,10 @@ input[type="submit"] {
 /* SONG QUEUE */
 .song_container {
 	padding-top: 15px;
+    margin-left: 25% !important;
+}
+.votes-container {
+    margin-left: 10% !important;
 }
 .vote_button {
 	display: block;

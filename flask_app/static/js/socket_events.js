@@ -5,7 +5,7 @@ function create_song(title) {
     var container = $("<div class = 'col-xs-6 col-sm-6 col-md-5 col-md-offset-2'></div>")
     var title = $("<h5 class = 'song_title'>" + title + "</h5><hr>");
 
-    var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2'>");
+    var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
     var upvote_button = $("<img src='static/img/up_arrow_black.png' class='vote_button'></img>");
     var downvote_button = $("<img src='static/img/down_arrow_black.png' class='vote_button'></img>");
 
