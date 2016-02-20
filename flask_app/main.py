@@ -42,14 +42,19 @@ def hello(name=None):
     return render_template('host.html', name=name)
 '''
 
-@app.route('/')
-def get_page():
+@app.route('/guest')
+def get_guest_page():
     connected_user = User(request.remote_addr)
     if get_user(connected_user) is None:
         users.append(connected_user)
     return render_template('index.html')
 
-    return render_template('guest.html')
+@app.route('/nowplaying')
+def get_nowplaying_page()
+    #connected_user = User(request.remote_addr)
+    #if get_user(connected_user) is None:
+    #    users.append(connected_user)
+    return render_template('nowplaying.html')
 
 @socketio.on('search')
 def handle_search(message):
