@@ -3,8 +3,7 @@ import threading
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 
-from Core import Song, User, Action
-from youtube_search import search_youtube
+from Core import Song, User, Action, search_youtube
 
 
 
