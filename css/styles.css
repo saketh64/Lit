@@ -49,16 +49,18 @@ h1, h2, h3 {
 	background-size: 100% 350px;
 	height: 350px;
 	position: relative;
+    padding: 10px 30px 0px 0px;
 }
 .site_title {
 	font-family: 'Sinkin-Sans100Thin';
+    font-size: 40px;
 	color: white;
 	float: right;
 }
 .logo {
 	width: 25px;
 	float: right;
-	margin-top: 7px;
+	margin-top: 10px;
 	margin-right: 10px;
 }
 .current_song_container {
@@ -71,21 +73,24 @@ h1, h2, h3 {
 }
 .current_song_title {
 	font-family: 'Sinkin-Sans100Thin';
+    font-size: 50px;
 	color: white;
 }
-.add_song_button {
-	position: absolute;
-	bottom: 0;
-	right: 1%;
+.add_skip_container {
+    position: absolute;
+    bottom: 5px;
+    right: 20px;
+}
+.add_skip_button {
 	cursor: pointer;
 	z-index: 5;
 }
-.plus_pic {
-	width: 25px;
+.add_skip_pic {
+	width: 20px;
 	float: left;
-	margin: 5px 5px 0 0;
+	margin: 8px 5px 0 0;
 }
-.plus_text {
+.add_skip_text {
 	float: left;
 	color: white;
 	font-family: 'Sinkin-Sans100Thin';
