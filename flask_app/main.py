@@ -72,17 +72,11 @@ def get_nowplaying_page():
     if nowplaying_ip == None:
         nowplaying_ip = User(request.remote_addr)
         threading.Timer(2, nowplaying_send_heartbeat).start()
+        threading.Timer(1, emit_new_nowplaying_song).start()
         return render_template('nowplaying.html')
     else:
         print "Someone tried to connect to nowplaying.html, but there's already a connection."
         return "Can't connect - there is already a user on the Now Playing screen."
-
-
-@app.route('/host')
-def get_host_page():
-    threading.Timer(1, emit_update_list).start()
-    return render_template("host.html")
-
 
 @app.route('/user')
 def get_user_page():
@@ -103,7 +97,7 @@ def get_user_page():
             users.append(User(user_id))
 
     threading.Timer(1, emit_update_list).start()
-    threading.Timer(1,emit_now_playing_song).start()
+    threading.Timer(1,emit_now_playing_song_title).start()
     return resp
 
 
@@ -275,8 +269,8 @@ def next_song(message):
             queue = queue[1:]
         else:
             queue = []
-        socketio.emit('new_song', now_playing.get_json(),broadcast=True)
-        emit_update_list()
+    emit_new_nowplaying_song()
+    emit_update_list()
 
 
 #########################################
@@ -299,8 +293,18 @@ def emit_update_list():
 def emit_search_results(search_results):
     socketio.emit('search_results', search_results, broadcast=True)
 
-def emit_now_playing_song():
-    socketio.emit('now_playing_song_title', now_playing.get_json(), broadcast=True)
+def emit_now_playing_song_title():
+    if now_playing is not None:
+        socketio.emit('now_playing_song_title', now_playing.get_json(),broadcast=True)
+    else:
+        socketio.emit('now_playing_song_title', None,broadcast=True)
+
+def emit_new_nowplaying_song():
+    if now_playing is not None:
+        socketio.emit('new_song', now_playing.get_json(),broadcast=True)
+    else:
+        socketio.emit('new_song', None,broadcast=True)
+
 
 #########################################
 # MAIN ENTRY POINT OF FLASK APP

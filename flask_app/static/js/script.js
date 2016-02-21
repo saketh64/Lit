@@ -16,10 +16,24 @@ $(document).ready(function() {
 });
 
 socket.on('new_song', function (message){
-    $('.current_song_title').text(message["title"]);
+	if (message)
+	{
+		$('.current_song_title').text(message["title"]);
+	}
+	else
+	{
+			$('.current_song_title').text("No song is playing");
+	}
 });
 
 // only called on initial guest.html page load
 socket.on('now_playing_song_title', function (message){
-    $('.current_song_title').text(message["title"]);
+		if (message)
+		{
+			$('.current_song_title').text(message["title"]);
+		}
+		else
+		{
+				$('.current_song_title').text("No song is playing");
+		}
 });
