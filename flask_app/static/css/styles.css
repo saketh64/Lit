@@ -46,10 +46,11 @@ h1, h2, h3 {
 	background-image: url("../img/host_user_header_bg1.png");
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-size: 100% 350px;
-	height: 350px;
+	background-size: 100% 450px;
+	height: 450px;
 	position: relative;
     padding: 10px 30px 0px 0px;
+    margin-bottom: 20px;
 }
 
 /* INDEX */
@@ -134,10 +135,15 @@ hr {
 .current_song_container {
 	width: 100%;
 	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
+	top: 40%;
+	transform: translateY(-40%);
 	text-align: center;
 	overflow: auto;
+}
+.current_song_subcontainer {
+    display: inline-block;
+    height: 100%;
+    margin: auto;
 }
 .current_song_title {
 	font-family: 'Sinkin-Sans100Thin';
@@ -155,12 +161,58 @@ hr {
 .add_skip_pic {
 	width: 30px;
 	float: left;
-	margin: 15px 5px 0 0;
+	margin: 4px 7px 0 0;
 }
 .add_skip_text {
 	float: left;
 	color: white;
 	font-family: 'Sinkin-Sans200XLight';
+}
+.up-next1 {
+    display: inline-block;
+    position: absolute;
+    vertical-align: bottom;
+    bottom: 0px;
+    left: 80px;
+    background-color: rgba(50, 50, 50, 0.5);
+    color: #fff;
+    height: 150px;
+    width: 150px;
+    padding: 20px 30px;
+}
+.up-next2 {
+    display: inline-block;
+    position: absolute;
+    vertical-align: bottom;
+    bottom: 0px;
+    left: 230px;
+    background-color: #66ccff;
+    color: #000;
+    height: 150px;
+    width: 150px;
+    padding: 30px 10px;
+}
+.left-triangle {
+    position: absolute;
+    right: -1px;
+    top: 45px;
+    display: inline-block;
+    height: 30px;
+}
+p {
+    font-family: 'Sinkin-Sans200XLight';
+    color: #fff;
+    text-align: left;
+    size: 15px;
+}
+.up-next1 h4 {
+    display: inline-block;
+    font-family: 'Sinkin-Sans200XLight';
+    font-size: 25px;
+}
+.up-next2 h5 {
+    font-family: 'Sinkin-Sans200XLight';
+    font-size: 15px;
 }
 /* /HOST GUEST HEADER */
 
@@ -169,7 +221,8 @@ hr {
     display: none;
 	position: fixed;
 	top: 25%;
-	right: 50%;
+    left: 25%;
+    right: 25%;
 	z-index: 10;
 	width: 50%;
 	height: 400px;
@@ -261,12 +314,40 @@ input[type="submit"] {
 	#search-modal {
 		width: 100%;
         right: 0;
+        left: 0;
 	}
+    .current_song_title {
+        font-size: 25px;
+    }
+    .up-next1 {
+        display: none;
+    }
+    .up-next2 {
+        display: none;
+    }
     #search-input {
         margin: 30px 0 0 0;
     }
     #header {
         height: 250px;
+    }
+    .add_skip_pic {
+        margin: 10px 7px 0px 0px;
+        height: 15px;
+        width: 15px;
+    }
+    .site_title {
+        display: none;
+    }
+    .logo {
+        display: none;
+    }
+    #now_playing {
+        display: none;
+    }
+    #song_divider {
+        margin-left: 20% !important;
+        width: 40% !important;
     }
 }
 

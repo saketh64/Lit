@@ -44,6 +44,13 @@ socket.on('update_list', function (message) {
     }
     var user_activity = message["activity"][my_user_id];
     //alert(JSON.stringify(user_activity));
+    if (message["queue"].length > 0) {
+        $(".next_song_title").empty();
+        $(".next_song_title").append(message["queue"][0]["title"]);
+    } else {
+        $(".next_song_title").empty();
+        $(".next_song_title").append("No songs are queued.");
+    }
     for(var i = 0;i < message["queue"].length;i++)
     {
         var current_song = message["queue"][i];
