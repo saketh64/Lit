@@ -1,14 +1,14 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-function create_song(title) {
+function create_song(title, url) {
     var ret = $("<div></div>");
     var result = $("<div class='row'></div>");
     var container = $("<div class = 'col-xs-6 col-sm-6 col-md-5 col-md-offset-2'></div>")
     var title = $("<h5 class = 'song_title'>" + title + "</h5>");
 
     var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
-    var upvote_button = $("<img src='static/img/up_arrow_black.png' class='vote_button' onmouseover='hoverUpvote(this);' onmouseout='unhoverUpvote(this);'></img>");
-    var downvote_button = $("<img src='static/img/down_arrow_black.png' class='vote_button' onmouseover='hoverDownvote(this);' onmouseout='unhoverDownvote(this);'></img>");
+    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button' onclick='clickUpvote(this);' onmouseover='hoverUpvote(this);' onmouseout='unhoverUpvote(this);'></img>");
+    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button' onclick='clickDownvote(this);' onmouseover='hoverDownvote(this);' onmouseout='unhoverDownvote(this);'></img>");
 
 
     votes_container.append(upvote_button).append(downvote_button);
@@ -77,7 +77,7 @@ socket.on('update_list', function (message) {
     {
         // TODO: populate queue of songs
         var current_song = message[i];
-        $('.song_container').append(create_song(current_song["title"]));
+        $('.song_container').append(create_song(current_song["title"], current_song["url"]));
     }
 });
 
@@ -110,7 +110,12 @@ $(document).on('click', '.add_plus_pic', function(){
 
 });
 
-
+function clickUpvote(element) {
+    upvote(element.getAttribute('id'));
+}
+function clickDownvote(element) {
+    downvote(element.getAttribute('id'));
+}
 function hoverUpvote(element) {
     element.setAttribute('src', 'static/img/up_arrow_blue.png');
 }
