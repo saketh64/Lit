@@ -94,6 +94,11 @@ socket.on('search_results', function (message) {
 });
 
 
+$('#search-input-field').keydown(function(e) {
+    if (e.keyCode == 13) {
+        $('.search-icon').click();
+    }
+});
 
 $('.search-icon').click(function(){
     search($('#search-input input').val());
