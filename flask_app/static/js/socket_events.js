@@ -69,7 +69,7 @@ socket.on('connect', function() {
 });
 
 socket.on('search_results', function (message) {
-    console.log(message["user_id"]);
+    console.log("Search returned to user: "+message["user_id"]);
     if(message["user_id"] != Cookies.get('user_id'))
       return;
 
