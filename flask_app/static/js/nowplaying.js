@@ -1,9 +1,8 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 socket.on('heartbeat_to_client', function (message) {
-	socket.emit('heartbeat_to_server', {});
+  socket.emit('heartbeat_to_server', {});
 });
-
 
 // Inject YouTube API script
 var tag = document.createElement('script');
@@ -55,13 +54,15 @@ function onPlayerReady(event) {
 function onPlayerStateChange(event) {
 	if (event.data == 0) {
 		socket.emit('song_end', {});
-		console.log("reached");
 	}
+
 }
 
-socket.on('new_song', function (message){
-	var contents = message["url"].split('/watch?v=');
-	var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
-	$('#video').attr('src', newsrc);
-});
+ socket.on('new_song', function (message){
+    console.log(message["url"]);
+    var contents = message["url"].split('/watch?v=');
+    var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
+    player.loadVideoByUrl(newsrc);
+  });
+
 
