@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Sinkin-Sans100Thin';
+    src: url('fonts/SinkinSans-100Thin.otf');
+    font-weight: normal;
+    font-style: normal;
+}
 
 h1, h2, h3 {
 	padding: none;
@@ -12,36 +18,27 @@ body {
 	position: relative;
 }
 
-#pause-button {
+#play-button {
 	width:200px;
 	height:200px;
 	vertical-align:50%;
 	background-image: url("../img/pause.png");
 	background-size: 100%;
-}
-
-#pause-button:hover {
-	background-image: url("../img/pause_hover.png");
-}
-
-#play-button {
-	width:200px;
-	height:200px;
-	vertical-align:50%;
-	background-image: url("../img/play.png");
-	background-size: 100%;
+	cursor: pointer;
+	border-radius: 50%;
 	}
 
-#play-button:hover {
-	background-image: url("../img/play_hover.png");
+#play-button:hover{
+	box-shadow: 0px 0px 20px #000;
 }
 
-.container-fluid {
-	position:"relative";
+#curr_song_title {
+	font-family: 'Sinkin-Sans100Thin';
 }
 
-.row {
-	position:"absolute";
-	top:50%;
-	transform:trasnlateY(-50%);
+.vcenter {
+	display: block;
+  	margin-left: auto;
+  	margin-right: auto;
 }
+

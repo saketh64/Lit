@@ -11,6 +11,12 @@ tag.src = "//www.youtube.com/player_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+$(".button-row").css("margin-top", new_height());
+
+function new_height () {
+	return $(window).height()/4;
+}
+
 var player;
 
 function onYouTubePlayerAPIReady() {
@@ -24,19 +30,26 @@ function onYouTubePlayerAPIReady() {
   });
 }
 
+var play = false;
 function onPlayerReady(event) {
   
   // bind events
   var playButton = document.getElementById("play-button");
   playButton.addEventListener("click", function() {
-    player.playVideo();
+
+  	if(play == true)
+  	{
+  		$("#play-button").css("background-image", "url(static/img/pause.png)");
+  		player.playVideo();
+  	}
+  	else
+  	{
+  		$("#play-button").css("background-image", "url(static/img/play.png)");
+  		player.pauseVideo();
+  	}
+
+  	play = !play;    
   });
-  
-  var pauseButton = document.getElementById("pause-button");
-  pauseButton.addEventListener("click", function() {
-    player.pauseVideo();
-  });
-  
 }
 
 function onPlayerStateChange(event) {
