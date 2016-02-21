@@ -103,6 +103,7 @@ def get_user_page():
             users.append(User(user_id))
 
     threading.Timer(1, emit_update_list).start()
+    threading.Timer(1,emit_now_playing_song).start()
     return resp
 
 
@@ -297,6 +298,9 @@ def emit_update_list():
 
 def emit_search_results(search_results):
     socketio.emit('search_results', search_results, broadcast=True)
+
+def emit_now_playing_song():
+    socketio.emit('now_playing_song_title', now_playing.get_json(), broadcast=True)
 
 #########################################
 # MAIN ENTRY POINT OF FLASK APP
