@@ -1,7 +1,6 @@
 import threading
 
-
-from flask import Flask, render_template, request,make_response
+from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO
 
 from Core import Song, User, Action, search_youtube
@@ -11,17 +10,12 @@ from sessions import *
 # queue is a list of Song objects, ordered by score
 queue = []
 
-
-
 # IP of the user currently on nowplaying.html
 # We only allow one user at a time, because this page plays audio
 # We'll track connections with a heartbeat
 nowplaying_ip = None
 
 heartbeat_response_received = False
-
-
-
 
 
 def get_queue_json():
@@ -35,8 +29,6 @@ def get_queue_json():
     return result
 
 
-
-
 def update_queue_order():
     queue.sort(key=lambda song: song.score(), reverse=True)
 
@@ -47,6 +39,12 @@ app = Flask(__name__, static_url_path="/static")
 app.config['SECRET_KEY'] = 'sekrit!'
 
 socketio = SocketIO(app)
+
+
+
+#########################################
+# ENDPOINTS
+#########################################
 
 
 @app.route('/')
@@ -65,13 +63,11 @@ def get_nowplaying_page():
         print "Someone tried to connect to nowplaying.html, but there's already a connection."
         return "Can't connect - there is already a user on the Now Playing screen."
 
+
 @app.route('/host')
 def get_host_page():
-    threading.Timer(1,emit_update_list).start()
+    threading.Timer(1, emit_update_list).start()
     return render_template("host.html")
-
-
-
 
 
 @app.route('/user')
@@ -80,21 +76,25 @@ def get_user_page():
 
     user_id = request.cookies.get('user_id')
 
-
     if user_id == None:
         user_id = get_random_user_id()
-        resp.set_cookie('user_id',user_id)
+        resp.set_cookie('user_id', user_id)
         users.append(User(user_id))
-        print "NEW connection, user_id=",user_id
+        print "NEW connection, user_id=", user_id
     else:
-        print "Repeated connection, user_id=",user_id
+        print "Repeated connection, user_id=", user_id
 
         if not does_user_exist(user_id):
             print "Adding user to the users list - they weren't there for some reason. (likely debugging)"
             users.append(User(user_id))
 
-    threading.Timer(1,emit_update_list).start()
+    threading.Timer(1, emit_update_list).start()
     return resp
+
+
+#########################################
+# NOW PLAYING HEARTBEAT METHODS
+#########################################
 
 
 def nowplaying_send_heartbeat():
@@ -120,6 +120,12 @@ def nowplaying_timeout():
         print "Now Playing user has disconnected."
 
 
+#########################################
+# HANDLERS FOR SOCKET MESSAGES FROM CLIENTS
+#########################################
+
+
+
 @socketio.on('search')
 def handle_search(message):
     search_results = search_youtube(message[u"query"])
@@ -129,7 +135,6 @@ def handle_search(message):
 @socketio.on('add')
 def handle_add(message):
     user_id = request.cookies.get('user_id')
-
 
     title = message[u"title"]
     url = message[u"url"]
@@ -152,7 +157,6 @@ def handle_add(message):
 def handle_upvote(message):
     user_id = request.cookies.get('user_id')
 
-
     url = message[u"url"]
     songs_with_url = filter(lambda x: x.url == url, queue)
 
@@ -171,16 +175,14 @@ def handle_upvote(message):
 
         # if the user had previously downvoted, remove that downvote
         if this_user.has_downvoted(upvoted_song.url):
-            this_user.remove_action(upvoted_song.url,Action.DOWNVOTE)
+            this_user.remove_action(upvoted_song.url, Action.DOWNVOTE)
             upvoted_song.downvotes -= 1
-
 
         upvoted_song.upvotes += 1
         print "Set '%s' upvotes to %d" % (songs_with_url[0].title, songs_with_url[0].upvotes)
         this_user.add_action(upvoted_song.url, Action.UPVOTE)
         update_queue_order()
         emit_update_list()
-
 
 
 @socketio.on('downvote')
@@ -204,9 +206,8 @@ def handle_downvote(message):
 
         # if the user had previously upvoted, remove that upvote
         if this_user.has_upvoted(downvoted_song.url):
-            this_user.remove_action(downvoted_song.url,Action.UPVOTE)
+            this_user.remove_action(downvoted_song.url, Action.UPVOTE)
             downvoted_song.upvotes -= 1
-
 
         downvoted_song.downvotes += 1
         print "Set '%s' downvotes to %d" % (songs_with_url[0].title, songs_with_url[0].downvotes)
@@ -215,22 +216,29 @@ def handle_downvote(message):
         emit_update_list()
 
 
+#########################################
+# METHODS FOR EMITTING MESSAGES TO CLIENTS
+#########################################
+
 def emit_update_list():
     global users
 
     queue_json = get_queue_json()
-    print "Emitting a list update: # of songs=",len(queue_json)
+    print "Emitting a list update: # of songs=", len(queue_json)
     activity_json = get_all_user_activity_json()
     socketio.emit('update_list',
-    {
-      "queue":queue_json,
-      "activity":activity_json
-    })
+                  {
+                      "queue": queue_json,
+                      "activity": activity_json
+                  })
 
 
 def emit_search_results(search_results):
     socketio.emit('search_results', search_results, broadcast=True)
 
+#########################################
+# MAIN ENTRY POINT OF FLASK APP
+#########################################
 
 if __name__ == "__main__":
-    socketio.run(app,host='0.0.0.0',debug=True)
+    socketio.run(app, host='0.0.0.0', debug=True)
