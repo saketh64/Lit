@@ -77,13 +77,6 @@ def get_nowplaying_page():
         print "Someone tried to connect to nowplaying.html, but there's already a connection."
         return "Can't connect - there is already a user on the Now Playing screen."
 
-
-@app.route('/host')
-def get_host_page():
-    threading.Timer(1, emit_update_list).start()
-    return render_template("host.html")
-
-
 @app.route('/user')
 def get_user_page():
     resp = make_response(render_template('guest.html'))
