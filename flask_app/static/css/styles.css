@@ -138,7 +138,6 @@ hr {
 	top: 40%;
 	transform: translateY(-40%);
 	text-align: center;
-	overflow: auto;
 }
 .current_song_subcontainer {
     display: inline-block;
