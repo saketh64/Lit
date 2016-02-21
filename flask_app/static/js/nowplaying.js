@@ -59,11 +59,17 @@ function onPlayerStateChange(event) {
 }
 
  socket.on('new_song', function (message){
+   if (message)
+ 	{
     console.log(message["url"]);
     var contents = message["url"].split('/watch?v=');
     var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
     player.loadVideoByUrl(newsrc);
     $('.current_song_title').text(message["title"]);
+ 	}
+ 	else
+ 	{
+ 			$('.current_song_title').text("No song is playing");
+ 	}
+
   });
-
-
