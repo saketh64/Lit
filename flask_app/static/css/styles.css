@@ -182,12 +182,6 @@ hr {
     bottom: 0px;
     left: 0px;
     z-index: 99;
-    -webkit-filter: blur(10px);
-    -moz-filter: blur(10px);
-    -o-filter: blur(10px);
-    -ms-filter: blur(10px);
-    filter: blur(10px);
-    opacity: 0.4;
 }
 .search-container {
     position: relative;
@@ -243,11 +237,10 @@ hr {
 	overflow: scroll;
 }
 .search_results::-webkit-scrollbar {
-	width: .75em;
+	width: .25em;
 }
 .search_results::-webkit-scrollbar-thumb {
-	background-color: #057fb0;
-	outline: 1px solid black;
+	background-color: #fff;
 	border-radius: 25px;
 }
 .add_plus_pic {
