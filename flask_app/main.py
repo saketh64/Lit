@@ -43,6 +43,8 @@ def update_queue_order():
             queue = queue[1:]
         else:
             queue = []
+            socketio.emit('new_song', now_playing.get_json(),broadcast=True)
+            emit_update_list()
 
 
 app = Flask(__name__, static_url_path="/static")
@@ -101,6 +103,7 @@ def get_user_page():
             users.append(User(user_id))
 
     threading.Timer(1, emit_update_list).start()
+    threading.Timer(1,emit_now_playing_song).start()
     return resp
 
 
@@ -149,6 +152,8 @@ def handle_search(message):
 
 @socketio.on('add')
 def handle_add(message):
+    global queue
+
     user_id = request.cookies.get('user_id')
 
     title = message[u"title"]
@@ -159,6 +164,7 @@ def handle_add(message):
     if len(songs_with_url) > 0:
         print "Song has already been added!"
     else:
+        print "Adding a new song with title '%s'" % title
         queue.append(
             Song(title, url)
         )
@@ -269,7 +275,8 @@ def next_song(message):
             queue = queue[1:]
         else:
             queue = []
-        socketio.emit('new_song', now_playing.get_json())
+        socketio.emit('new_song', now_playing.get_json(),broadcast=True)
+        emit_update_list()
 
 
 #########################################
@@ -291,6 +298,9 @@ def emit_update_list():
 
 def emit_search_results(search_results):
     socketio.emit('search_results', search_results, broadcast=True)
+
+def emit_now_playing_song():
+    socketio.emit('now_playing_song_title', now_playing.get_json(), broadcast=True)
 
 #########################################
 # MAIN ENTRY POINT OF FLASK APP
