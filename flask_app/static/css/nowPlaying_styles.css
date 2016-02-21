@@ -18,7 +18,6 @@ body {
 	vertical-align:50%;
 	background-image: url("../img/pause.png");
 	background-size: 100%;
-	display: inline-block;
 }
 
 #pause-button:hover {
@@ -31,10 +30,18 @@ body {
 	vertical-align:50%;
 	background-image: url("../img/play.png");
 	background-size: 100%;
-	display: inline-block;
 	}
 
 #play-button:hover {
 	background-image: url("../img/play_hover.png");
 }
 
+.container-fluid {
+	position:"relative";
+}
+
+.row {
+	position:"absolute";
+	top:50%;
+	transform:trasnlateY(-50%);
+}
