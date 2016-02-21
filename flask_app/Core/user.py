@@ -9,8 +9,8 @@ class User:
             What songs has the user added?
     """
 
-    def __init__(self, ip_addr):
-        self.ip_addr = ip_addr
+    def __init__(self, user_id):
+        self.user_id = user_id
         self.activity = []
         self.added_songs = []
 
