@@ -1,6 +1,6 @@
 import threading
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,session
 from flask_socketio import SocketIO
 
 from Core import Song, User, Action, search_youtube
@@ -27,12 +27,23 @@ def get_user(ip):
 
 
 def get_queue_json():
+    global queue
     """
     :return: a JSON object to send to the client
     """
     result = []
     for song in queue:
         result.append(song.get_json())
+    return result
+
+def get_user_activity_json():
+    global users
+    """
+    :return: a JSON object of all user activity
+    """
+    result = {}
+    for user in users:
+        result[user.ip_addr] = user.activity
     return result
 
 
@@ -64,12 +75,13 @@ def get_nowplaying_page():
         print "Someone tried to connect to nowplaying.html, but there's already a connection."
         return "Can't connect - there is already a user on the Now Playing screen."
 
+@socketio.on('connected')
+def connected():
+    print "%s connected, %s" % (request.namespace,session)
 
 @app.route('/host')
 def get_host_page():
-    connected_user = User(request.remote_addr)
-    if get_user(connected_user) is None:
-        users.append(connected_user)
+    threading.Timer(1,emit_update_list).start()
     return render_template("host.html")
 
 
@@ -139,11 +151,27 @@ def handle_upvote(message):
         print "Couldn't upvote."
     else:
         upvoted_song = songs_with_url[0]
+
+        this_user = get_user(request.remote_addr)
+
+        # the user can't upvote this song again!
+        if this_user.has_upvoted(upvoted_song.url):
+            print "User tried to upvote song '%s' again - ignoring." % upvoted_song.title
+            return
+
+
+        # if the user had previously downvoted, remove that downvote
+        if this_user.has_downvoted(upvoted_song.url):
+            this_user.remove_action(upvoted_song.url,Action.DOWNVOTE)
+            upvoted_song.downvotes -= 1
+
+
         upvoted_song.upvotes += 1
         print "Set '%s' upvotes to %d" % (songs_with_url[0].title, songs_with_url[0].upvotes)
         get_user(request.remote_addr).add_action(upvoted_song.url, Action.UPVOTE)
         update_queue_order()
         emit_update_list()
+
 
 
 @socketio.on('downvote')
@@ -155,6 +183,18 @@ def handle_downvote(message):
         print "Couldn't downvote."
     else:
         downvoted_song = songs_with_url[0]
+
+        # the user can't downvote this song again!
+        if get_user(request.remote_addr).has_downvoted(downvoted_song.url):
+            print "User tried to downvote song '%s' again - ignoring." % downvoted_song.title
+            return
+
+        # if the user had previously upvoted, remove that upvote
+        if get_user(request.remote_addr).has_upvoted(downvoted_song.url):
+            get_user(request.remote_addr).remove_action(downvoted_song.url,Action.UPVOTE)
+            downvoted_song.upvotes -= 1
+
+
         downvoted_song.downvotes += 1
         print "Set '%s' downvotes to %d" % (songs_with_url[0].title, songs_with_url[0].downvotes)
         get_user(request.remote_addr).add_action(downvoted_song.url, Action.DOWNVOTE)
@@ -163,7 +203,16 @@ def handle_downvote(message):
 
 
 def emit_update_list():
-    socketio.emit('update_list', get_queue_json(), broadcast=True)
+    global users
+
+    queue_json = get_queue_json()
+    print "Emitting a list update: # of songs=",len(queue_json)
+    activity_json = get_user_activity_json()
+    socketio.emit('update_list',
+    {
+      "queue":queue_json,
+      "activity":activity_json
+    })
 
 
 def emit_search_results(search_results):
@@ -171,4 +220,4 @@ def emit_search_results(search_results):
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app,host='0.0.0.0',debug=True)
