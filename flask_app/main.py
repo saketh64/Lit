@@ -180,7 +180,7 @@ def nowplaying_timeout():
 
 
 @socketio.on('song_end')
-def next_song():
+def next_song(message):
     global queue, now_playing
     now_playing = None
     if len(queue) > 0:

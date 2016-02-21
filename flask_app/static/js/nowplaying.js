@@ -18,7 +18,8 @@ function onYouTubePlayerAPIReady() {
   player = new YT.Player('video', {
     events: {
       // call this function when player is ready to use
-      'onReady': onPlayerReady
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
     }
   });
 }
@@ -37,3 +38,17 @@ function onPlayerReady(event) {
   });
   
 }
+
+function onPlayerStateChange(event) {
+	if (event.data == 0) {
+		socket.emit('song_end', {});
+		console.log("reached");
+	}
+}
+
+socket.on('new_song', function (message){
+	var contents = message["url"].split('/watch?v=');
+	var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
+	$('#video').attr('src', newsrc);
+});
+
