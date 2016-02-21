@@ -1,7 +1,5 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-var myIPAddress = null;
-
 function create_song(title, url, upvoted, downvoted) {
     var ret = $("<div></div>");
     var result = $("<div class='row'></div>");
@@ -83,9 +81,12 @@ var urls = [];
 
 socket.on('update_list', function (message) {
     $('.song_container').empty();
-    console.log("Updating list. IP="+myIPAddress);
-    var user_activity = message["activity"][myIPAddress];
-    alert(JSON.stringify(user_activity));
+    var my_user_id;
+    if (!(my_user_id = Cookies.get('user_id'))) {
+        console.log("User doesn't have an ID cookie.");
+    }
+    var user_activity = message["activity"][my_user_id];
+    //alert(JSON.stringify(user_activity));
     for(var i = 0;i < message["queue"].length;i++)
     {
         var current_song = message["queue"][i];
@@ -121,30 +122,6 @@ socket.on('search_results', function (message) {
         $('.search_results').append(create_search_result(song["title"], i));
     }
 });
-
-function myIP() {
-    if (window.XMLHttpRequest) xmlhttp = new XMLHttpRequest();
-    else xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-
-    xmlhttp.open("GET","http://api.hostip.info/get_html.php",false);
-    xmlhttp.send();
-
-    hostipInfo = xmlhttp.responseText.split("\n");
-
-    for (i=0; hostipInfo.length >= i; i++) {
-        ipAddress = hostipInfo[i].split(":");
-        if ( ipAddress[0] == "IP" ) return ipAddress[1];
-    }
-
-    return false;
-}
-
-//socket.on('get_ip', function (message) {
-//  myIPAddress = message["ip"];
-//});
-myIPAddress = myIP();
-console.log(myIPAddress);
-
 
 $('#search-input-field').keydown(function(e) {
     if (e.keyCode == 13) {
