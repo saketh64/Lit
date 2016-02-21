@@ -160,7 +160,7 @@ hr {
 .add_skip_text {
 	float: left;
 	color: white;
-	font-family: 'Sinkin-Sans100Thin';
+	font-family: 'Sinkin-Sans200XLight';
 }
 /* /HOST GUEST HEADER */
 
@@ -187,7 +187,7 @@ hr {
     position: relative;
     z-index: 100;
     padding: 20px;
-    background: rgba(34,34,34,0.75);
+    background: rgba(34,34,34,0.85);
 }
 .close {
     height: 20px;
@@ -286,5 +286,5 @@ input[type="submit"] {
 	color: black;
 }
 #song_divider {
-
+    width: 100%;
 }
