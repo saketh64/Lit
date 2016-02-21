@@ -51,12 +51,38 @@ function onPlayerReady(event) {
   });
 }
 
+function progress(percent, $element) {
+  var progressBarWidth = percent * $element.width() / 100;
+
+// $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
+
+  $element.find('div').animate({ width: progressBarWidth });
+}
+
 function onPlayerStateChange(event) {
 	if (event.data == 0) {
 		socket.emit('song_end', {});
 	}
 
+  if (event.data == YT.PlayerState.PLAYING) {
+
+      $('#progressBar').show();
+      var playerTotalTime = player.getDuration();
+
+      mytimer = setInterval(function() {
+        var playerCurrentTime = player.getCurrentTime();
+
+        var playerTimeDifference = (playerCurrentTime / playerTotalTime) * 100;
+
+
+        progress(playerTimeDifference, $('#progressBar'));
+      }, 1000);        
+    } else {
+      
+      clearTimeout(mytimer);
+    }
 }
+
 
  socket.on('new_song', function (message){
     console.log(message["url"]);
