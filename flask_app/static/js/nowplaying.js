@@ -63,6 +63,7 @@ function onPlayerStateChange(event) {
     var contents = message["url"].split('/watch?v=');
     var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
     player.loadVideoByUrl(newsrc);
+    $('.current_song_title').text(message["title"]);
   });
 
 

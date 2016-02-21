@@ -32,8 +32,9 @@ body {
 	box-shadow: 0px 0px 20px #000;
 }
 
-.curr_song_title {
+.current_song_title {
 	font-family: 'Sinkin-Sans100Thin';
+	color: white;
 }
 
 .vcenter {

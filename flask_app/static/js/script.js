@@ -17,5 +17,4 @@ $(document).ready(function() {
 
 socket.on('new_song', function (message){
     $('.current_song_title').text(message["title"]);
-
  });
