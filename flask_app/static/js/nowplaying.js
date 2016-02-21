@@ -31,7 +31,7 @@ function onYouTubePlayerAPIReady() {
 
 var play = false;
 function onPlayerReady(event) {
-  
+
   // bind events
   var playButton = document.getElementById("play-button");
   playButton.addEventListener("click", function() {
@@ -47,8 +47,10 @@ function onPlayerReady(event) {
   		player.pauseVideo();
   	}
 
-  	play = !play;    
+  	play = !play;
   });
+
+  player.mute();
 }
 
 function progress(percent, $element) {
@@ -76,9 +78,9 @@ function onPlayerStateChange(event) {
 
 
         progress(playerTimeDifference, $('#progressBar'));
-      }, 1000);        
+      }, 500);
     } else {
-      
+
       clearTimeout(mytimer);
     }
 }
@@ -91,6 +93,7 @@ function onPlayerStateChange(event) {
     var contents = message["url"].split('/watch?v=');
     var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
     player.loadVideoByUrl(newsrc);
+    player.unMute();
     $('.current_song_title').text(message["title"]);
  	}
  	else
