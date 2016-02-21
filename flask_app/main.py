@@ -128,8 +128,12 @@ def nowplaying_timeout():
 
 @socketio.on('search')
 def handle_search(message):
+    user_id = request.cookies.get('user_id')
     search_results = search_youtube(message[u"query"])
-    emit_search_results(search_results)
+    emit_search_results({
+      "user_id" : user_id,
+      "search_results" : search_results
+    })
 
 
 @socketio.on('add')

@@ -69,12 +69,17 @@ socket.on('connect', function() {
 });
 
 socket.on('search_results', function (message) {
+    console.log(message["user_id"]);
+    if(message["user_id"] != Cookies.get('user_id'))
+      return;
+
+
     $('.search_results').empty();
     urls = [];
-    for(var i = 0;i < message.length;i++)
+    for(var i = 0;i < message["search_results"].length;i++)
     {
         // TODO: populate search results
-        var song = message[i];
+        var song = message["search_results"][i];
         urls[i] = song["url"];
         $('.search_results').append(create_search_result(song["title"], i));
     }
