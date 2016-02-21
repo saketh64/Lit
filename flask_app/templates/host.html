@@ -33,15 +33,26 @@
         </div>
 	</div>
 
-	<!-- SEARCH MODAL -->
-	<div class = "search_modal">
-		<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<input type = "text" name = "search_term" class = "search_term">
-		<img class = "search_icon" src = "static/img/search_icon.svg">
-		<hr>
-		<div class = "container-fluid search_results">
+    <!-- SEARCH MODAL -->
+    <div id="search-modal">
+        <div id="search-bg"></div>
+	    <div class = "search-container">
+		    <img class="close-icon" src="static/img/close.png">
+            <div id="search-input">
+                <div class="input-group col-md-12">
+                    <input id="search-input-field" type="text" class="form-control input-lg" placeholder="search youtube" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info btn-lg" type="button">
+                            <img class="search-icon" src="static/img/search_icon_white.png">
+                        </button>
+                    </span>
+                </div>
+            </div>
+		    <hr>
+		    <div class = "container-fluid search_results">
 
-		</div>
+		    </div>
+        </div>
 	</div>
 
 	<!-- SONG QUEUE -->

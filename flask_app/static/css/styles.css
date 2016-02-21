@@ -107,7 +107,7 @@ h1, h2, h3 {
 #index-body h2 {
     font-family: 'Sinkin-Sans200XLight';
 }
-#index-body hr {
+hr {
     width: 30%;
     height: 1px;
     background-image: linear-gradient(to right, rgba(3, 149, 208, 0), rgba(3, 149, 208, 0.75), rgba(3, 149, 208, 0));
@@ -160,32 +160,88 @@ h1, h2, h3 {
 .add_skip_text {
 	float: left;
 	color: white;
-	font-family: 'Sinkin-Sans100Thin';
+	font-family: 'Sinkin-Sans200XLight';
 }
 /* /HOST GUEST HEADER */
 
 /* SEARCH MODAL */
-.search_modal {
-	display: none;
+#search-modal {
+    display: none;
 	position: fixed;
 	top: 25%;
 	right: 50%;
 	transform: translateX(50%);
-	background-color: white;
-	border: 1px solid black;
-	border-radius: 10px;
 	z-index: 10;
 	width: 50%;
 	height: 400px;
-	overflow: scroll;
 }
-.search_icon {
+#search-bg {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 99;
+}
+.search-container {
+    position: relative;
+    z-index: 100;
+    padding: 20px;
+    background: rgba(34,34,34,0.85);
+}
+.close {
+    height: 20px;
+}
+#search-input {
+    padding: 3px;
+    border: solid 1px #E4E4E4;
+    border-radius: 6px;
+    background: transparent;
+    margin: 30px 50px 0px 50px;
+    color: #fff;
+}
+#search-input input {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    font-family: 'Sinkin-Sans200XLight';
+    color: #fff;
+}
+#search-input button {
+    margin: 2px 0 0 0;
+    background: none;
+    box-shadow: none;
+    border: 0;
+    color: #666666;
+    padding: 0 8px 0 10px;
+    border-left: solid 1px #ccc;
+}
+#search-input button:hover {
+    border: 0;
+    box-shadow: none;
+    border-left: solid 1px #ccc;
+}
+.close-icon {
+    float: right;
+    margin: 5px;
+    cursor: pointer;
+    height: 20px;
+}
+.search-icon {
 	cursor: pointer;
+    height: 20px;
 }
 .search_results {
-	background-color: #0395d0;
-	width: 100%;
-	border-radius: 10px;
+	background: transparent;
+	height: 275px;
+	overflow: scroll;
+}
+.search_results::-webkit-scrollbar {
+	width: .25em;
+}
+.search_results::-webkit-scrollbar-thumb {
+	background-color: #fff;
+	border-radius: 25px;
 }
 .add_plus_pic {
 	width: 20px;
@@ -194,13 +250,8 @@ h1, h2, h3 {
 }
 .search_title {
 	color: white;
-	font-family: 'Sinkin-Sans100Thin';
-}
-.search_term {
-	width: 75%;
-	margin-left: 7.5%;
-	margin-top: 5%;
-	height: 20px;
+	font-family: 'Sinkin-Sans200XLight';
+    font-size: 15px;
 }
 input[type="submit"] {
 	height: 20px;
@@ -219,12 +270,21 @@ input[type="submit"] {
 /* SONG QUEUE */
 .song_container {
 	padding-top: 15px;
+    margin-left: 17% !important;
+}
+.votes-container {
+    margin-left: 10% !important;
 }
 .vote_button {
 	display: block;
-	width: 25px;
+	width: 20px;
+    margin: 5px 0px;
+    cursor: pointer;
 }
 .song_title {
 	font-family: 'Sinkin-Sans300Light';
 	color: black;
+}
+#song_divider {
+    width: 100%;
 }
