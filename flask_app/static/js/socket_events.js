@@ -89,12 +89,12 @@ function create_song(title, url, upvoted, downvoted) {
     var title = $("<h5 class = 'song_title'>" + title + "</h5>");
 
     var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
-    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button' onclick='upvote(this.getAttribute('id'));'></img>");
+    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button' onclick='upvote(this.getAttribute(\"id\"));'></img>");
     if (upvoted)
     {
       upvote_button.attr('src', 'static/img/up_arrow_blue.png');
     }
-    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button' onclick='upvote(this.getAttribute('id'));'></img>");
+    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button' onclick='downvote(this.getAttribute(\"id\"));'></img>");
     if (downvoted)
     {
       downvote_button.attr('src', 'static/img/down_arrow_blue.png');
