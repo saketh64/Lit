@@ -22,14 +22,15 @@ nowplaying_ip = None
 heartbeat_response_received = False
 
 
-def get_queue_json():
-    global queue
+def get_queue_json(userID=None):
     """
+    userID is used to give the user THEIR particular vote data
     :return: a JSON object to send to the client
     """
+    global queue
     result = []
     for song in queue:
-        result.append(song.get_json())
+        result.append(song.get_json(userID))
     return result
 
 
@@ -86,13 +87,12 @@ def get_user_page():
     else:
         now_playing_title = "No song is playing"
 
-    resp = make_response(render_template('guest.html',queue=get_queue_json(),now_playing_title=now_playing_title))
+
 
     user_id = request.cookies.get('user_id')
 
     if user_id == None:
         user_id = get_random_user_id()
-        resp.set_cookie('user_id', user_id)
         users.append(User(user_id))
         print "NEW connection, user_id=", user_id
     else:
@@ -101,6 +101,15 @@ def get_user_page():
         if not does_user_exist(user_id):
             print "Adding user to the users list - they weren't there for some reason. (likely debugging)"
             users.append(User(user_id))
+
+
+    resp = make_response(render_template('guest.html',queue=get_queue_json(user_id),now_playing_title=now_playing_title))
+
+    # No harm in just doing this regardless
+    resp.set_cookie('user_id', user_id)
+
+
+
 
     # threading.Timer(1, emit_update_list).start()
     # threading.Timer(1,emit_now_playing_song_title).start()
@@ -166,10 +175,8 @@ def handle_add(message):
     else:
         print "Adding a new song with title '%s'" % title
         queue.append(
-            Song(title, url)
+            Song(title, url, user_id)
         )
-        get_user(user_id).add_song(url)
-        get_user(user_id).add_action(url, Action.UPVOTE)
         update_queue_order()
         if now_playing == None:
             next_song()
@@ -187,23 +194,15 @@ def handle_upvote(message):
         print "Couldn't upvote."
     else:
         upvoted_song = songs_with_url[0]
-
         this_user = get_user(user_id)
 
         # the user can't upvote this song again!
-        if this_user.has_upvoted(upvoted_song.url):
+        if this_user.has_upvoted(upvoted_song):
             print "User tried to upvote song '%s' again - ignoring." % upvoted_song.title
             return
 
-
-        # if the user had previously downvoted, remove that downvote
-        if this_user.has_downvoted(upvoted_song.url):
-            this_user.remove_action(upvoted_song.url, Action.DOWNVOTE)
-            upvoted_song.downvotes -= 1
-
-        upvoted_song.upvotes += 1
-        print "Set '%s' upvotes to %d" % (songs_with_url[0].title, songs_with_url[0].upvotes)
-        this_user.add_action(upvoted_song.url, Action.UPVOTE)
+        this_user.upvote(upvoted_song)
+        print "Set '%s' upvotes to %d" % (songs_with_url[0].title, len(songs_with_url[0].upvotes))
         update_queue_order()
         emit_update_list()
 
@@ -219,22 +218,15 @@ def handle_downvote(message):
         print "Couldn't downvote."
     else:
         downvoted_song = songs_with_url[0]
-
         this_user = get_user(user_id)
 
         # the user can't downvote this song again!
-        if this_user.has_downvoted(downvoted_song.url):
+        if this_user.has_downvoted(downvoted_song):
             print "User tried to downvote song '%s' again - ignoring." % downvoted_song.title
             return
 
-        # if the user had previously upvoted, remove that upvote
-        if this_user.has_upvoted(downvoted_song.url):
-            this_user.remove_action(downvoted_song.url, Action.UPVOTE)
-            downvoted_song.upvotes -= 1
-
-        downvoted_song.downvotes += 1
-        print "Set '%s' downvotes to %d" % (songs_with_url[0].title, songs_with_url[0].downvotes)
-        this_user.add_action(downvoted_song.url, Action.DOWNVOTE)
+        this_user.downvote(downvoted_song)
+        print "Set '%s' downvotes to %d" % (songs_with_url[0].title, len(songs_with_url[0].downvotes))
         update_queue_order()
         emit_update_list()
 
@@ -288,11 +280,11 @@ def emit_update_list():
 
     queue_json = get_queue_json()
     print "Emitting a list update: # of songs=", len(queue_json)
-    activity_json = get_all_user_activity_json()
+    #activity_json = get_all_user_activity_json()
     socketio.emit('update_list',
                   {
                       "queue": queue_json,
-                      "activity": activity_json
+                      "activity": None
                   })
 
 
