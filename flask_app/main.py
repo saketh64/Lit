@@ -81,7 +81,12 @@ def get_nowplaying_page():
 
 @app.route('/user')
 def get_user_page():
-    resp = make_response(render_template('guest.html',queue=get_queue_json()))
+    if now_playing is not None:
+        now_playing_title = now_playing.title
+    else:
+        now_playing_title = "No song is playing"
+
+    resp = make_response(render_template('guest.html',queue=get_queue_json(),now_playing_title=now_playing_title))
 
     user_id = request.cookies.get('user_id')
 
@@ -98,7 +103,7 @@ def get_user_page():
             users.append(User(user_id))
 
     # threading.Timer(1, emit_update_list).start()
-    threading.Timer(1,emit_now_playing_song_title).start()
+    # threading.Timer(1,emit_now_playing_song_title).start()
     return resp
 
 
