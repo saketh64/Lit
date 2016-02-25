@@ -28,7 +28,7 @@ class Song:
         time_minutes = (time.time() - self.time_added) / 60.0
         return (len(self.upvotes) / (float(len(self.downvotes)) + 1.0)) ** VOTE_WEIGHT * time_minutes ** TIME_WEIGHT
 
-    def get_json(self,userID):
+    def get_json(self,userID=None):
         result = {}
         result["title"] = self.title
         result["url"] = self.url

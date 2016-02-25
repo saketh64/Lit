@@ -24,15 +24,21 @@
     			<h1 class = "current_song_title">{{ now_playing_title }}</h1>
             </div>
 		</div>
-        {% if queue|length > 0 %}
+        
         <div class="up-next1">
             <h4>UP<br>NEXT</h4>
             <img class="left-triangle" src="static/img/left_triangle.png"></span>
         </div>
         <div class="up-next2">
-            <h5 class="next_song_title">{{ queue[0].title }}</h5>
+            <h5 class="next_song_title">
+                {% if queue|length > 0 %}
+                    {{ queue[0].title }}
+                {% else %}
+                    Nothing is queued up
+                {% endif %}
+            
+            </h5>
         </div>
-        {% endif %}
         <div class="add_skip_container">
 		    <div class = "add_skip_button" id = "add_song">
 			    <img class = "add_skip_pic" src = "static/img/plus.png">
