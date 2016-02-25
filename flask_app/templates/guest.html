@@ -63,7 +63,21 @@
 
 	<!-- SONG QUEUE -->
 	<div class = "container song_container">
-
+    {% for song in queue %}
+        
+    <div>
+    <div class="row">
+        <div class="col-xs-6 col-sm-6 col-md-5 col-md-offset-2">
+            <h5 class="song_title">{{ song.title }}</h5>
+        </div>
+        <div class="col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container">
+            <img id="{{ song.url }}" src="static/img/up_arrow_black.png" class="vote_button" onclick="upvote(this.getAttribute('id'));">
+            <img id="{{ song.url }}" src="static/img/down_arrow_black.png" class="vote_button" onclick="downvote(this.getAttribute('id'));">
+        </div>
+    </div>
+    <hr id="song_divider">
+</div>
+    {% endfor %}
 	</div>
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>

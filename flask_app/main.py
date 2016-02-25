@@ -33,6 +33,7 @@ def get_queue_json():
     return result
 
 
+
 def update_queue_order():
     global queue, now_playing
     queue.sort(key=lambda song: song.score(), reverse=True)
@@ -80,7 +81,7 @@ def get_nowplaying_page():
 
 @app.route('/user')
 def get_user_page():
-    resp = make_response(render_template('guest.html'))
+    resp = make_response(render_template('guest.html',queue=get_queue_json()))
 
     user_id = request.cookies.get('user_id')
 
@@ -96,7 +97,7 @@ def get_user_page():
             print "Adding user to the users list - they weren't there for some reason. (likely debugging)"
             users.append(User(user_id))
 
-    threading.Timer(1, emit_update_list).start()
+    # threading.Timer(1, emit_update_list).start()
     threading.Timer(1,emit_now_playing_song_title).start()
     return resp
 
