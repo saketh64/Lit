@@ -101,33 +101,28 @@ socket.on('search_results', function (message) {
 
 /* GENERATE HTML */
 function create_song(title, url, upvoted, downvoted) {
-    var ret = $("<div></div>");
-    var result = $("<div class='row'></div>");
-    var container = $("<div class = 'col-xs-6 col-sm-6 col-md-5 col-md-offset-2'></div>")
+    var row_container = $("<div class='row_container'></div>");
+    var song_title_container = $("<div class = 'song_title_container'></div>")
     var title = $("<h5 class = 'song_title'>" + title + "</h5>");
 
-    var votes_container = $("<div class = 'col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container'>");
-    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button' onclick=\"upvote(this.getAttribute('id'));\"></img>");
+    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button_up' onclick=\"upvote(this.getAttribute('id'));\"></img>");
     if (upvoted)
     {
       upvote_button.attr('src', 'static/img/up_arrow_blue.png');
     }
-    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button' onclick=\"downvote(this.getAttribute('id'));\"></img>");
+    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button_down' onclick=\"downvote(this.getAttribute('id'));\"></img>");
     if (downvoted)
     {
       downvote_button.attr('src', 'static/img/down_arrow_blue.png');
     }
 
-    votes_container.append(upvote_button).append(downvote_button);
+    song_title_container.append(title);
+    row_container.append(song_title_container);
+    row_container.append(upvote_button);
+    row_container.append(downvote_button);
+    row_container.append("<hr id='song_divider'>");
 
-    container.append(title);
-
-    result.append(container).append(votes_container);
-
-    ret.append(result);
-    ret.append("<hr id='song_divider'>");
-
-    return ret;
+    return row_container;
 }
 
 function create_search_result(title, id) {

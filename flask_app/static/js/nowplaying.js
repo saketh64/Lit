@@ -102,3 +102,9 @@ function onPlayerStateChange(event) {
  	}
 
   });
+
+ $('body').keydown(function(e){
+      if (e.keyCode == 39) {
+        player.seekTo(10000);
+      }
+ })
