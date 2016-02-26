@@ -147,6 +147,7 @@ $(document).on('click', '.add_plus_pic', function(){
     var id = $(this).attr("id");
     var title = $(document.getElementById(id)).text();
     add(title, urls[id]);
+    $('#blur_wrapper').removeClass('blur');
     $('#search-modal').fadeOut(200);
 });
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
