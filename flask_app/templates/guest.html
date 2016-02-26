@@ -9,41 +9,47 @@
 </head>
 
 <body>
-	<div class = "body_wrapper">
+	<div id="blur_wrapper">
 	<!-- HEADER -->
-    <div class = "container-fluid" id = "header">
-		<div class = "row">
-			<div class = "col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8">
-				<h3 class = "site_title">Lit</h3>
-				<img class = "logo" src = "static/img/logo_trans.png">
-			</div>
-		</div>
-		<div class = "current_song_container">
-            <div class="current_song_subcontainer">
-                <p id="now_playing">now playing:</p>
-    			<h1 class = "current_song_title">No song is playing.</h1>
+        <div class = "container-fluid" id = "header">
+    		<div class = "row">
+    			<div class = "col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8">
+    				<h3 class = "site_title">Lit</h3>
+    				<img class = "logo" src = "static/img/logo_trans.png">
+    			</div>
+    		</div>
+    		<div class = "current_song_container">
+                <div class="current_song_subcontainer">
+                    <p id="now_playing">now playing:</p>
+        			<h1 class = "current_song_title">No song is playing.</h1>
+                </div>
+    		</div>
+            <div class="up-next1">
+                <h4>UP<br>NEXT</h4>
+                <img class="left-triangle" src="static/img/left_triangle.png"></span>
             </div>
-		</div>
-        <div class="up-next1">
-            <h4>UP<br>NEXT</h4>
-            <img class="left-triangle" src="static/img/left_triangle.png"></span>
-        </div>
-        <div class="up-next2">
-            <h5 class="next_song_title">Childish Gambino - Blah Blah</h5>
-        </div>
-        <div class="add_skip_container">
-		    <div class = "add_skip_button" id = "add_song">
-			    <img class = "add_skip_pic" src = "static/img/plus.png">
-			    <h4 class = "add_skip_text">add song</h4>
-		    </div>
-        </div>
-	</div>
+            <div class="up-next2">
+                <h5 class="next_song_title">Childish Gambino - Blah Blah</h5>
+            </div>
+            <div class="add_skip_container">
+    		    <div class = "add_skip_button" id = "add_song">
+    			    <img class = "add_skip_pic" src = "static/img/plus.png">
+    			    <h4 class = "add_skip_text">add song</h4>
+    		    </div>
+            </div>
+    	</div>
 
-	<!-- SEARCH MODAL -->
+    	<!-- SONG QUEUE -->
+    	<div class = "container song_container">
+
+    	</div>
+    </div>
+
+    <!-- SEARCH MODAL -->
     <div id="search-modal">
         <div id="search-bg"></div>
-	    <div class = "search-container">
-		    <img class="close-icon" src="static/img/close.png">
+        <div class = "search-container">
+            <img class="close-icon" src="static/img/close.png">
             <div id="search-input">
                 <div class="input-group col-md-12">
                     <input id="search-input-field" type="text" class="form-control input-lg" placeholder="search youtube" />
@@ -54,17 +60,12 @@
                     </span>
                 </div>
             </div>
-		    <hr>
-		    <div class = "container-fluid search_results">
+            <hr>
+            <div class = "container-fluid search_results">
 
-		    </div>
+            </div>
         </div>
-	</div>
-
-	<!-- SONG QUEUE -->
-	<div class = "container song_container">
-
-	</div>
+    </div>
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
