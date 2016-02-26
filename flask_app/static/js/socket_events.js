@@ -42,8 +42,6 @@ socket.on('update_list', function (message) {
     if (!(my_user_id = Cookies.get('user_id'))) {
         console.log("User doesn't have an ID cookie.");
     }
-    var user_activity = message["activity"][my_user_id];
-    //alert(JSON.stringify(user_activity));
     if (message["queue"].length > 0) {
         $(".next_song_title").empty();
         $(".next_song_title").append(message["queue"][0]["title"]);
@@ -56,15 +54,23 @@ socket.on('update_list', function (message) {
         var current_song = message["queue"][i];
         var upvoted = false;
         var downvoted = false;
-        for (var j = 0;j < user_activity.length;j++)
+        for (var j = 0;j < current_song.upvote.length;j++)
         {
-          if (user_activity[j]["url"] == current_song["url"])
+          if (current_song.upvote[j] == my_user_id)
           {
             console.log("Detected a user vote on "+current_song["url"])
-            if (user_activity[j]["action_type"] == 0)
-              upvoted = true;
-            else
-              downvoted = true;
+            upvoted = true
+            break;
+          }
+        }
+        
+        for (var j = 0;j < current_song.downvote.length;j++)
+        {
+          if (current_song.downvote[j] == my_user_id)
+          {
+            console.log("Detected a user vote on "+current_song["url"])
+            downvoted = true
+            break;
           }
         }
         $('.song_container').append(create_song(current_song["title"], current_song["url"],upvoted,downvoted));

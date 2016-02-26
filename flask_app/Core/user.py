@@ -11,32 +11,23 @@ class User:
 
     def __init__(self, user_id):
         self.user_id = user_id
-        self.activity = []
         self.added_songs = []
 
-    def add_action(self, song_url, action_type):
-        self.activity.append({
-            "url":song_url,
-            "action_type":action_type
-        })
+    def has_upvoted(self,song):
+        return (self.user_id in song.upvotes)
 
-    def remove_action(self, song_url, action_type):
-        self.activity.remove({
-            "url":song_url,
-            "action_type":action_type
-        })
+    def has_downvoted(self,song):
+        return (self.user_id in song.downvotes)
 
-    def has_upvoted(self,song_url):
-        for action in self.activity:
-            if action["url"] == song_url and action["action_type"] == Action.UPVOTE:
-                return True
-        return False
+    def upvote(self,song):
+        song.upvotes.append(self.user_id)
+        if self.user_id in song.downvotes:
+            song.downvotes.remove(self.user_id)
 
-    def has_downvoted(self,song_url):
-        for action in self.activity:
-            if action["url"] == song_url and action["action_type"] == Action.DOWNVOTE:
-                return True
-        return False
+    def downvote(self,song):
+        song.downvotes.append(self.user_id)
+        if self.user_id in song.upvotes:
+            song.upvotes.remove(self.user_id)
 
     def add_song(self, song_url):
         self.added_songs.append(song_url)
