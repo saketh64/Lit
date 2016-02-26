@@ -144,31 +144,11 @@ function create_search_result(title, id) {
 /* ~~~~~~~~~~~~~~~~~~~~ */
 
 /* LISTENERS */
-$(document).ready(function() {
-    $('#add_song').click(function() {
-        $('#search-modal').fadeIn(200);
-        $('#search-input-field').focus();
-    });
-
-    $('.close-icon').click(function(){
-        $('#search-modal').fadeOut(200)
-    });
-
-    $('#search-input-field').keydown(function(e) {
-        if (e.keyCode == 13) {
-            $('.search-icon').click();
-        }
-    });
-
-    $('.search-icon').click(function(){
-        search($('#search-input input').val());
-    });
-});
-
 $(document).on('click', '.add_plus_pic', function(){
     var id = $(this).attr("id");
     var title = $(document.getElementById(id)).text();
     add(title, urls[id]);
+    $('#blur_wrapper').removeClass('blur');
     $('#search-modal').fadeOut(200);
 });
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
