@@ -70,31 +70,31 @@
 	</div>
 
 	<!-- SONG QUEUE -->
-	<div class = "container song_container">
+	<div class = "song_container">
     {% for song in queue %}
         
-    <div>
-    <div class="row">
-        <div class="col-xs-6 col-sm-6 col-md-5 col-md-offset-2">
+  
+    <div class="row_container">
+        <div class="song_title_container">
             <h5 class="song_title">{{ song.title }}</h5>
         </div>
-        <div class="col-xs-1 col-xs-offset-3 col-sm-1 col-sm-offset-4 col-md-2 col-md-offset-2 votes-container">
+        
             {% if song.upvote %}
-            <img id="{{ song.url }}" src="static/img/up_arrow_blue.png" class="vote_button" onclick="upvote(this.getAttribute('id'));">
+            <img id="{{ song.url }}" src="static/img/up_arrow_blue.png" class="vote_button_up" onclick="upvote(this.getAttribute('id'));">
             {% else %}
-            <img id="{{ song.url }}" src="static/img/up_arrow_black.png" class="vote_button" onclick="upvote(this.getAttribute('id'));">
+            <img id="{{ song.url }}" src="static/img/up_arrow_black.png" class="vote_button_up" onclick="upvote(this.getAttribute('id'));">
             {% endif %}
             
             {% if song.downvote %}
-            <img id="{{ song.url }}" src="static/img/down_arrow_blue.png" class="vote_button" onclick="downvote(this.getAttribute('id'));">
+            <img id="{{ song.url }}" src="static/img/down_arrow_blue.png" class="vote_button_down" onclick="downvote(this.getAttribute('id'));">
             {% else %}
-            <img id="{{ song.url }}" src="static/img/down_arrow_black.png" class="vote_button" onclick="downvote(this.getAttribute('id'));">
+            <img id="{{ song.url }}" src="static/img/down_arrow_black.png" class="vote_button_down" onclick="downvote(this.getAttribute('id'));">
             {% endif %}
             
-        </div>
-    </div>
+    
+    
     <hr id="song_divider">
-</div>
+    </div>
     {% endfor %}
 	</div>
 
