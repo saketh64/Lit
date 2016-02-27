@@ -63,6 +63,13 @@ def help_search_youtube(query):
     return videos
 
 class YouTubeSearchResult():
+    """
+    fields (all are strings or None):
+        youtube_title
+        url
+        artist
+        title
+    """
     def __init__(self,youtube_title,url):
         self.youtube_title = youtube_title
         self.url = url
@@ -72,6 +79,7 @@ class YouTubeSearchResult():
         self.title = None
 
     def __eq__(self,other):
+        """Checks title/artist equality if possible, otherwise just uses url"""
         if not isinstance(other,YouTubeSearchResult):
             return False
 
