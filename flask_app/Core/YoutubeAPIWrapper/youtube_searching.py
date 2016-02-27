@@ -2,15 +2,20 @@
 
 from apiclient.discovery import build
 from apiclient.errors import HttpError
+from youtube_filter import filter_results
 
 DEVELOPER_KEY = ""
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
 # Main method
-def search_youtube(query):
+def search_youtube(query,enable_filter=True):
     set_developer_key()
-    return help_search_youtube(query)
+    result = help_search_youtube(query)
+    if enable_filter:
+        return filter_results(result)
+    else:
+        return result
 
 
 # Replace spaces with '\ '
@@ -51,10 +56,6 @@ def help_search_youtube(query):
             # Get the url and the video title
             title = search_result["snippet"]["title"]
             url = "%s%s" % ("https://www.youtube.com/watch?v=", search_result["id"]["videoId"])
-
-            print search_result
-
-            print "URL: %s Title: %s" % (url, title)
 
             # Add to dictionary here
             videos.append(YouTubeSearchResult(title,url))

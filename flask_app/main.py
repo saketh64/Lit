@@ -153,6 +153,7 @@ def nowplaying_timeout():
 def handle_search(message):
     user_id = request.cookies.get('user_id')
     search_results = search_youtube(message[u"query"])
+    search_results = [result.__dict__ for result in search_results]
     emit_search_results({
       "user_id" : user_id,
       "search_results" : search_results
