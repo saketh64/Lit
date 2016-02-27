@@ -1,5 +1,4 @@
 import re
-from youtube_search import search_youtube
 
 # pattern to parse artist and title from a youtube video title
 PARSE_PATTERN = "([^\r\n-]{1,}) - ([^-\r\n]{1,})"
@@ -24,7 +23,6 @@ def try_parse(line):
         title = remove_modifiers(title)
         return format(artist),format(title)
     else:
-        #print "Couldn't Parse '%s'" % line
         return None,None
 
 
@@ -32,11 +30,6 @@ def can_add(results,new_result):
     if new_result in results:
         return False
 
-
-    '''
-    if swapped_new_result in results:
-        return False
-    '''
     return True
 
 
@@ -50,21 +43,13 @@ def filter_results(results):
             result.artist = artist
 
             if can_add(filtered_results,result):
-                # print "Adding",result,"||||",result.youtube_title
                 filtered_results.append(result)
+
             else:
-                print "Skipping",result,"||||",result.youtube_title
+                print "Skipping '"+result.youtube_title+"'"
         else:
             unparsed_results.append(result)
 
     filtered_results += unparsed_results
 
     return filtered_results
-
-
-test_results = search_youtube("chance the rapper")
-result = filter_results(test_results)
-
-print "="*10,"FINAL RESULTS","="*10
-for r in result:
-    print r.youtube_title
