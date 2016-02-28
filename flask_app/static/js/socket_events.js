@@ -41,12 +41,6 @@ function downvote(_url) {
 /* EVENTS FROM BACKEND */
 socket.on('update_list', function (message) {
     $('.song_container').empty()
-    /*
-    var my_user_id;
-    if (!(my_user_id = Cookies.get('user_id'))) {
-        console.log("User doesn't have an ID cookie.");
-    }
-    */
     if (message["queue"].length > 0) {
         $(".next_song_title").empty();
         $(".next_song_title").append(message["queue"][0]["title"]);
@@ -62,10 +56,6 @@ socket.on('update_list', function (message) {
 });
 
 socket.on('search_results', function (message) {
-    //console.log("Search returned to user: "+message["user_id"]);
-    //if(message["user_id"] != Cookies.get('user_id'))
-    //  return;
-
     $('.search_results').empty();
     urls = [];
     for(var i = 0;i < message["search_results"].length;i++)
