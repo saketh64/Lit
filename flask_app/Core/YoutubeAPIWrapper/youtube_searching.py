@@ -26,7 +26,7 @@ def format_query(my_query):
 
 # Sets the developer key
 def set_developer_key():
-    f = open("key.txt")
+    f = open("youtube_key.txt")
     line = f.readline()
     global DEVELOPER_KEY
     DEVELOPER_KEY = line

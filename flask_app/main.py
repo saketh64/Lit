@@ -51,8 +51,10 @@ def update_queue_order():
 
 app = Flask(__name__, static_url_path="/static")
 
-# what is this
-app.config['SECRET_KEY'] = 'sekrit!'
+# Read in secret key for Flask from local text file
+f = open("flask_key.txt")
+app.config['SECRET_KEY'] = f.readline()
+f.close()
 
 socketio = SocketIO(app)
 
