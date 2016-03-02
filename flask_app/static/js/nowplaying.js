@@ -51,6 +51,9 @@ function onPlayerReady(event) {
   });
 
   player.mute();
+    
+    console.log('emitting nowplaying_connect');
+    socket.emit('nowplaying_connect', {});
 }
 
 function progress(percent, $element) {
@@ -75,7 +78,9 @@ function onPlayerStateChange(event) {
         var playerCurrentTime = player.getCurrentTime();
 
         var playerTimeDifference = (playerCurrentTime / playerTotalTime) * 100;
-
+        socket.emit('update_song_time',{
+            'time' : playerCurrentTime
+        });
 
         progress(playerTimeDifference, $('#progressBar'));
       }, 500);
@@ -84,6 +89,11 @@ function onPlayerStateChange(event) {
       clearTimeout(mytimer);
     }
 }
+
+ socket.on('update_song_time', function (message){
+     if(player)
+        player.seekTo(message["time"]);
+  });
 
 
  socket.on('new_song', function (message){
