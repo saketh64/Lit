@@ -63,7 +63,7 @@ socket.on('search_results', function (message) {
         // TODO: populate search results
         var song = message["search_results"][i];
         urls[i] = song["url"];
-        $('.search_results').append(create_search_result(song["title"], i));
+        $('.search_results').append(create_search_result(song["youtube_title"], i));
     }
 });
 /* ~~~~~~~~~~~~~~~~~~~~~~~ */
