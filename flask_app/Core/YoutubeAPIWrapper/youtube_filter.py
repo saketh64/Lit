@@ -3,8 +3,8 @@ import re
 # pattern to parse artist and title from a youtube video title
 PARSE_PATTERN = "([^\r\n-]{1,}) - ([^-\r\n]{1,})"
 
-# pattern to parse modifiers, e.g. "(Official Video)"
-MODIFIER_PATTERN = "\(.*?\)"
+# pattern to parse modifiers, e.g. "(Official Video) or [2016]"
+MODIFIER_PATTERN = "(\(.*?\)|\[.*?\])"
 
 def remove_modifiers(youtube_title):
     """Removes things like "(Official album version)" from a youtube title
@@ -24,12 +24,12 @@ def try_parse(youtube_title):
     :param youtube_title: str
     :return: tuple -> (artist,title) or (None,None)
     """
+    youtube_title = format(remove_modifiers(youtube_title))
+
     result = re.match(PARSE_PATTERN,youtube_title)
     if result != None:
         artist = result.group(1)
         title = result.group(2)
-
-        title = remove_modifiers(title)
         return format(artist),format(title)
     else:
         return None,None
