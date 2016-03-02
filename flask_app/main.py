@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO
 
 
-from Core import Song, User, Action, search_youtube
+from Core import Song, User, search_youtube
 from sessions import *
 
 
@@ -153,6 +153,7 @@ def nowplaying_timeout():
 def handle_search(message):
     user_id = request.cookies.get('user_id')
     search_results = search_youtube(message[u"query"])
+    search_results = [result.__dict__ for result in search_results]
     emit_search_results({
       "user_id" : user_id,
       "search_results" : search_results
