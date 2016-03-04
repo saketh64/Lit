@@ -1,7 +1,7 @@
 import threading
 
 from flask import Flask, render_template, request, make_response
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO,rooms
 
 
 from Core import Song, User, search_youtube
@@ -22,7 +22,7 @@ nowplaying_ip = None
 heartbeat_response_received = False
 
 
-def get_queue_json(userID=None):
+def get_queue_json(userID):
     """
     userID is used to give the user THEIR particular vote data
     :return: a JSON object to send to the client
@@ -110,9 +110,6 @@ def get_user_page():
     # No harm in just doing this regardless
     resp.set_cookie('user_id', user_id)
 
-
-
-
     # threading.Timer(1, emit_update_list).start()
     # threading.Timer(1,emit_now_playing_song_title).start()
     return resp
@@ -154,12 +151,13 @@ def nowplaying_timeout():
 @socketio.on('search')
 def handle_search(message):
     user_id = request.cookies.get('user_id')
+    this_user = get_user(user_id)
+
     search_results = search_youtube(message[u"query"])
-    search_results = [result.__dict__ for result in search_results]
-    emit_search_results({
-      "user_id" : user_id,
-      "search_results" : search_results
-    })
+
+    socketio.emit('search_results', {
+        "search_results" : search_results
+    }, room=this_user.room_id)
 
 
 @socketio.on('add')
@@ -234,6 +232,17 @@ def handle_downvote(message):
         emit_update_list()
 
 
+@socketio.on('connect')
+def handle_user_connection():
+    this_user = get_user(request.cookies.get('user_id'))
+
+    if this_user != None:
+        this_user.set_room_id(rooms()[0])
+    else:
+        print "Couldn't find user on connect..."
+        pass
+
+
 ######################
 # Events for the Now Playing page
 ######################
@@ -281,18 +290,14 @@ def next_song(message):
 def emit_update_list():
     global users
 
-    queue_json = get_queue_json()
-    print "Emitting a list update: # of songs=", len(queue_json)
-    #activity_json = get_all_user_activity_json()
-    socketio.emit('update_list',
-                  {
-                      "queue": queue_json,
-                      "activity": None
-                  })
-
-
-def emit_search_results(search_results):
-    socketio.emit('search_results', search_results, broadcast=True)
+    # emit the lsit to each user individually
+    for user in users:
+        queue_json = get_queue_json(user.user_id)
+        print "Emitting a list update: # of songs=", len(queue_json)
+        socketio.emit('update_list',
+                      {
+                          "queue": queue_json
+                      },room=user.room_id)
 
 def emit_now_playing_song_title():
     if now_playing is not None:

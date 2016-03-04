@@ -1,17 +1,21 @@
 class User:
     """
     Fields:
-        ip_addr (str)
-            IP address of the user (public IP?)
-        activity (list)
-            What has the user upvoted/downvoted?
+        user_id
+            The user's ID - should be persistent across sessions, because it'll be stored as a cookie client side.
+        room_id
+            The session ID - new every time the user refreshes. Used to emit socket events JUST to that user.
         added_songs (list)
-            What songs has the user added?
+            Songs added by the user
+            (note: don't think this is currently being used)
     """
 
     def __init__(self, user_id):
         self.user_id = user_id
         self.added_songs = []
+
+    def set_room_id(self,room_id):
+        self.room_id = room_id
 
     def has_upvoted(self,song):
         return (self.user_id in song.upvotes)
@@ -31,8 +35,3 @@ class User:
 
     def add_song(self, song_url):
         self.added_songs.append(song_url)
-
-
-class Action:
-    UPVOTE = 0
-    DOWNVOTE = 1

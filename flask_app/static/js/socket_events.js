@@ -1,5 +1,8 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
+
+socket.emit('connect',{});
+
 var urls = [];
 
 /* EVENTS TO BACKEND */
@@ -37,11 +40,7 @@ function downvote(_url) {
 
 /* EVENTS FROM BACKEND */
 socket.on('update_list', function (message) {
-    $('.song_container').empty();
-    var my_user_id;
-    if (!(my_user_id = Cookies.get('user_id'))) {
-        console.log("User doesn't have an ID cookie.");
-    }
+    $('.song_container').empty()
     if (message["queue"].length > 0) {
         $(".next_song_title").empty();
         $(".next_song_title").append(message["queue"][0]["title"]);
@@ -52,41 +51,11 @@ socket.on('update_list', function (message) {
     for(var i = 0;i < message["queue"].length;i++)
     {
         var current_song = message["queue"][i];
-        var upvoted = false;
-        var downvoted = false;
-        for (var j = 0;j < current_song.upvote.length;j++)
-        {
-          if (current_song.upvote[j] == my_user_id)
-          {
-            console.log("Detected a user vote on "+current_song["url"])
-            upvoted = true
-            break;
-          }
-        }
-        
-        for (var j = 0;j < current_song.downvote.length;j++)
-        {
-          if (current_song.downvote[j] == my_user_id)
-          {
-            console.log("Detected a user vote on "+current_song["url"])
-            downvoted = true
-            break;
-          }
-        }
-        $('.song_container').append(create_song(current_song["title"], current_song["url"],upvoted,downvoted));
+        $('.song_container').append(create_song(current_song));
     }
 });
 
-socket.on('connect', function() {
-    socket.emit('connected');
-});
-
 socket.on('search_results', function (message) {
-    console.log("Search returned to user: "+message["user_id"]);
-    if(message["user_id"] != Cookies.get('user_id'))
-      return;
-
-
     $('.search_results').empty();
     urls = [];
     for(var i = 0;i < message["search_results"].length;i++)
@@ -100,18 +69,18 @@ socket.on('search_results', function (message) {
 /* ~~~~~~~~~~~~~~~~~~~~~~~ */
 
 /* GENERATE HTML */
-function create_song(title, url, upvoted, downvoted) {
+function create_song(song) {
     var row_container = $("<div class='row_container'></div>");
     var song_title_container = $("<div class = 'song_title_container'></div>")
-    var title = $("<h5 class = 'song_title'>" + title + "</h5>");
+    var title = $("<h5 class = 'song_title'>" + song["title"] + "</h5>");
 
-    var upvote_button = $("<img id='" + url + "' src='static/img/up_arrow_black.png' class='vote_button_up' onclick=\"upvote(this.getAttribute('id'));\"></img>");
-    if (upvoted)
+    var upvote_button = $("<img id='" + song["url"] + "' src='static/img/up_arrow_black.png' class='vote_button_up' onclick=\"upvote(this.getAttribute('id'));\"></img>");
+    if (song["upvote"])
     {
       upvote_button.attr('src', 'static/img/up_arrow_blue.png');
     }
-    var downvote_button = $("<img id='" + url + "' src='static/img/down_arrow_black.png' class='vote_button_down' onclick=\"downvote(this.getAttribute('id'));\"></img>");
-    if (downvoted)
+    var downvote_button = $("<img id='" + song["url"] + "' src='static/img/down_arrow_black.png' class='vote_button_down' onclick=\"downvote(this.getAttribute('id'));\"></img>");
+    if (song["downvote"])
     {
       downvote_button.attr('src', 'static/img/down_arrow_blue.png');
     }
