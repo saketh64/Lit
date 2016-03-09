@@ -84,7 +84,7 @@ def get_party_page(party_name):
             now_playing_title = "No song is playing."
         else:
             now_playing_title = party.now_playing.title
-        return make_response(render_template('guest.html',queue=party.get_queue_json(user_id),now_playing_title=now_playing_title))
+        return make_response(render_template('guest.html',queue=party.get_queue_json(party.users[user_id]),now_playing_title=now_playing_title))
 
 
 #########################################
@@ -110,21 +110,12 @@ def handle_add(message):
     emit_queue(party)
 
 
-@socketio.on('upvote')
-def handle_upvote(message):
-    party, user, error = init_socket_event(message, 'handle_upvote')
+@socketio.on('vote')
+def handle_vote(message):
+    party, user, error = init_socket_event(message, 'handle_vote')
     if error: return
 
-    party.upvote(user, message['song_url'])
-    emit_queue(party)
-
-
-@socketio.on('downvote')
-def handle_downvote(message):
-    party, user, error = init_socket_event(message, 'handle_downvote')
-    if error: return
-
-    party.downvote(user, message['song_url'])
+    party.vote(user, message['song_url'], message['dir'])
     emit_queue(party)
 
 
@@ -159,7 +150,7 @@ def next_song(message):
 def emit_queue(party):
     # emit the queue to each user individually
     for user_id, user in party.users.iteritems():
-        queue_json = party.get_queue_json(user_id)
+        queue_json = party.get_queue_json(user)
         print "Emitting a list update: # of songs=", len(queue_json)
         socketio.emit('update_list',
                       {
