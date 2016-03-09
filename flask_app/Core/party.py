@@ -1,5 +1,21 @@
-class Party:
+"""
+ATTRIBUTES:
+    party_name
+    hosts[user_id]
+    users\{user_id: User\}
+    Song now_playing
+    queue[Song]
+PUBLIC METHODS:
+    add_song(User, song_url, title)
+    handle_upvote(User, song_url)
+    handle_downvote(User, song_url)
+    get_queue_json(User)
+        returns list of JSON formatted song data
+PRIVATE METHODS:
+    reorder_queue()
+"""
 
+class Party:
     def __init__(self, party_name, host_id):
         self.party_name = party_name
         self.hosts = [host_id]
@@ -16,10 +32,10 @@ class Party:
             self.queue.append(
                 Song(title, song_url, user.user_id)
             )
-            self.update_queue_order()
+            self.reorder_queue()
 
 
-    def handle_vote(self, user, song_url, dir):
+    def handle_upvote(self, user, song_url):
         song = next((song for song in queue if song.url == song_url), None)
 
         # check for errors
@@ -27,24 +43,34 @@ class Party:
             print "ERROR: Song URL not found."
             return
 
-        if dir == 'up':
-            # avoid double voting
-            if user.user_id in song.upvotes:
-                print "User tried to upvote song '%s' again - ignoring." % song.title
-                return
-            song.upvotes.append(user.user_id)
-            # remove user's downvote if there
-            song.downvotes.remove(user.user_id)
-        else:
-            # avoid double voting
-            if user.user_id in song.downvotes:
-                print "User tried to downvote song '%s' again - ignoring." % song.title
-                return
-            song.downvotes.append(user.user_id)
-            # remove user's downvote if there
-            song.upvotes.remove(user.user_id)
+        # avoid double voting
+        if user.user_id in song.upvotes:
+            print "User tried to upvote song '%s' again - ignoring." % song.title
+            return
 
-        self.update_queue_order()
+        song.upvotes.append(user.user_id)
+        song.downvotes.remove(user.user_id) # remove user's downvote if there
+
+        self.reorder_queue()
+
+
+    def handle_downvote(self, user, song_url):
+        song = next((song for song in queue if song.url == song_url), None)
+
+        # check for errors
+        if song == None:
+            print "ERROR: Song URL not found."
+            return
+
+        # avoid double voting
+        if user.user_id in song.downvotes:
+            print "User tried to upvote song '%s' again - ignoring." % song.title
+            return
+
+        song.downvotes.append(user.user_id)
+        song.upvotes.remove(user.user_id) # remove user's downvote if there
+
+        self.reorder_queue()
 
 
     def get_queue_json(self, user):
@@ -52,20 +78,14 @@ class Party:
         user is used to give the user THEIR particular vote data
         :return: a JSON object to send to the client
         """
-        result = []
-        for song in self.queue:
-            result.append(song.get_json(user.user_id))
-        return result
+        return [song.get_json(user.user_id) for song in self.queue]
 
-    def update_queue_order(self):
-        global queue, now_playing
-        queue.sort(key=lambda song: song.score(), reverse=True)
-
+    def reorder_queue(self):
+        # if needed, update now_playing BEFORE reordering the queue
+        # sacrifices accuracy for user experience
+        # (it would be jarring for the user if the song ended and the "up next" song didn't play next
+        # 99% of the time it won't matter
         if now_playing == None:
-            now_playing = queue[0]
-            if len(queue) >= 2:
-                queue = queue[1:]
-            else:
-                queue = []
-                socketio.emit('new_song', now_playing.get_json(),broadcast=True)
-                emit_update_list()
+            now_playing = queue.pop(0)
+
+        self.queue.sort(key=lambda song: song.score(), reverse=True)
