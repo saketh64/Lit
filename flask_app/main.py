@@ -3,51 +3,37 @@ import threading
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO,rooms
 
-
-from Core import Song, User, search_youtube
+from Core import Song, User, Party, search_youtube
 from sessions import *
 
 
-# queue is a list of Song objects, ordered by score
-queue = []
+#########################################
+# ~~~~~~~~~~~~~STRUCTURE~~~~~~~~~~~~~~~ #
+#   Client:
+#       user_id (cookie)
+#       party_name (url)
+#   Server:
+#       parties (party_name to Party obj)
+#           Party
+#               party_name
+#               users (user_id to User obj)
+#                   User
+#                       user_id
+#                       emit_id
+#               hosts
+#               queue
+#                   Song
+#                       title
+#                       url
+#                       upvotes
+#                           user_id
+#                       downvotes
+#                           user_id
+#
+#########################################
 
-# a Song object, the currently playing song
-now_playing = None
 
-# IP of the user currently on nowplaying.html
-# We only allow one user at a time, because this page plays audio
-# We'll track connections with a heartbeat
-nowplaying_ip = None
-
-heartbeat_response_received = False
-
-
-def get_queue_json(userID):
-    """
-    userID is used to give the user THEIR particular vote data
-    :return: a JSON object to send to the client
-    """
-    global queue
-    result = []
-    for song in queue:
-        result.append(song.get_json(userID))
-    return result
-
-
-
-def update_queue_order():
-    global queue, now_playing
-    queue.sort(key=lambda song: song.score(), reverse=True)
-
-    if now_playing == None:
-        now_playing = queue[0]
-        if len(queue) >= 2:
-            queue = queue[1:]
-        else:
-            queue = []
-            socketio.emit('new_song', now_playing.get_json(),broadcast=True)
-            emit_update_list()
-
+parties = {} # global mapping of party names to party objects
 
 app = Flask(__name__, static_url_path="/static")
 
@@ -59,257 +45,168 @@ f.close()
 socketio = SocketIO(app)
 
 
-
 #########################################
 # ENDPOINTS
 #########################################
-
 
 @app.route('/')
 def get_landing_page():
     return render_template('index.html')
 
 
-@app.route('/nowplaying')
-def get_nowplaying_page():
-    global nowplaying_ip
-    if nowplaying_ip == None:
-        nowplaying_ip = User(request.remote_addr)
-        threading.Timer(2, nowplaying_send_heartbeat).start()
-        threading.Timer(1, emit_new_nowplaying_song).start()
-        return render_template('nowplaying.html')
-    else:
-        print "Someone tried to connect to nowplaying.html, but there's already a connection."
-        return "Can't connect - there is already a user on the Now Playing screen."
+@app.route('/<party_name>')
+def get_party_page(party_name):
+    global parties
 
-@app.route('/user')
-def get_user_page():
-    if now_playing is not None:
-        now_playing_title = now_playing.title
-    else:
-        now_playing_title = "No song is playing"
-
-
-
+    # get user info
     user_id = request.cookies.get('user_id')
-
     if user_id == None:
         user_id = get_random_user_id()
-        users.append(User(user_id))
         print "NEW connection, user_id=", user_id
     else:
         print "Repeated connection, user_id=", user_id
 
-        if not does_user_exist(user_id):
-            print "Adding user to the users list - they weren't there for some reason. (likely debugging)"
-            users.append(User(user_id))
+    # make new party if needed
+    if party_name not in parties:
+        parties[party_name] = Party(party_name, user_id)
 
+    party = parties[party_name]
 
-    resp = make_response(render_template('guest.html',queue=get_queue_json(user_id),now_playing_title=now_playing_title))
+    # add user to party if needed
+    if user_id not in party.users:
+        party.users[user_id] = User(user_id)
 
-    # No harm in just doing this regardless
-    resp.set_cookie('user_id', user_id)
-
-    # threading.Timer(1, emit_update_list).start()
-    # threading.Timer(1,emit_now_playing_song_title).start()
-    return resp
-
-
-#########################################
-# NOW PLAYING HEARTBEAT METHODS
-#########################################
-
-
-def nowplaying_send_heartbeat():
-    global heartbeat_response_received
-
-    socketio.emit('heartbeat_to_client', None, broadcast=True)
-    heartbeat_response_received = False
-    threading.Timer(0.5, nowplaying_timeout).start()
-
-
-@socketio.on('heartbeat_to_server')
-def nowplaying_receive_heartbeat(message):
-    global heartbeat_response_received
-
-    heartbeat_response_received = True
-    threading.Timer(0.5, nowplaying_send_heartbeat).start()
-
-
-def nowplaying_timeout():
-    global nowplaying_ip
-    if heartbeat_response_received == False:
-        nowplaying_ip = None
-        print "Now Playing user has disconnected."
+    # render host or user page
+    if user_id in party.hosts:
+        return render_template('nowplaying.html')
+    else:
+        if party.now_playing == None:
+            now_playing_title = "No song is playing."
+        else:
+            now_playing_title = party.now_playing.title
+        return make_response(render_template('guest.html',queue=party.get_queue_json(user_id),now_playing_title=now_playing_title))
 
 
 #########################################
 # HANDLERS FOR SOCKET MESSAGES FROM CLIENTS
 #########################################
 
-
 @socketio.on('search')
 def handle_search(message):
-    user_id = request.cookies.get('user_id')
-    this_user = get_user(user_id)
-
-    search_results = search_youtube(message[u"query"])
+    party, user, error = init_socket_event(message, 'handle_search')
+    if error: return
 
     socketio.emit('search_results', {
-        "search_results" : search_results
-    }, room=this_user.room_id)
+        "search_results" : search_youtube(message['query'])
+    }, room=user.emit_id)
 
 
 @socketio.on('add')
 def handle_add(message):
-    global queue
+    party, user, error = init_socket_event(message, 'handle_add')
+    if error: return
 
-    user_id = request.cookies.get('user_id')
-
-    title = message[u"title"]
-    url = message[u"url"]
-
-    songs_with_url = filter(lambda x: x.url == url, queue)
-
-    if len(songs_with_url) > 0:
-        print "Song has already been added!"
-    else:
-        print "Adding a new song with title '%s'" % title
-        queue.append(
-            Song(title, url, user_id)
-        )
-        update_queue_order()
-        if now_playing == None:
-            next_song()
-        emit_update_list()
+    party.add_song(user, message['song_url'], message['title'])
+    emit_queue(party)
 
 
 @socketio.on('upvote')
 def handle_upvote(message):
-    user_id = request.cookies.get('user_id')
+    party, user, error = init_socket_event(message, 'handle_upvote')
+    if error: return
 
-    url = message[u"url"]
-    songs_with_url = filter(lambda x: x.url == url, queue)
-
-    if len(songs_with_url) != 1:
-        print "Couldn't upvote."
-    else:
-        upvoted_song = songs_with_url[0]
-        this_user = get_user(user_id)
-
-        # the user can't upvote this song again!
-        if this_user.has_upvoted(upvoted_song):
-            print "User tried to upvote song '%s' again - ignoring." % upvoted_song.title
-            return
-
-        this_user.upvote(upvoted_song)
-        print "Set '%s' upvotes to %d" % (songs_with_url[0].title, len(songs_with_url[0].upvotes))
-        update_queue_order()
-        emit_update_list()
+    party.upvote(user, message['song_url'])
+    emit_queue(party)
 
 
 @socketio.on('downvote')
 def handle_downvote(message):
-    user_id = request.cookies.get('user_id')
+    party, user, error = init_socket_event(message, 'handle_downvote')
+    if error: return
 
-    url = message[u"url"]
-    songs_with_url = filter(lambda x: x.url == url, queue)
-
-    if len(songs_with_url) != 1:
-        print "Couldn't downvote."
-    else:
-        downvoted_song = songs_with_url[0]
-        this_user = get_user(user_id)
-
-        # the user can't downvote this song again!
-        if this_user.has_downvoted(downvoted_song):
-            print "User tried to downvote song '%s' again - ignoring." % downvoted_song.title
-            return
-
-        this_user.downvote(downvoted_song)
-        print "Set '%s' downvotes to %d" % (songs_with_url[0].title, len(songs_with_url[0].downvotes))
-        update_queue_order()
-        emit_update_list()
+    party.downvote(user, message['song_url'])
+    emit_queue(party)
 
 
 @socketio.on('connect')
-def handle_user_connection():
-    this_user = get_user(request.cookies.get('user_id'))
+def handle_user_connection(message):
+    party, user, error = init_socket_event(message, 'handle_user_connection')
+    if error: return
 
-    if this_user != None:
-        this_user.set_room_id(rooms()[0])
-    else:
-        print "Couldn't find user on connect..."
-        pass
-
-
-######################
-# Events for the Now Playing page
-######################
-def nowplaying_send_heartbeat():
-    global heartbeat_response_received
-
-    socketio.emit('heartbeat_to_client', None, broadcast=True)
-    heartbeat_response_received = False
-    threading.Timer(0.5, nowplaying_timeout).start()
-
-
-@socketio.on('heartbeat_to_server')
-def nowplaying_receive_heartbeat(message):
-    global heartbeat_response_received
-
-    heartbeat_response_received = True
-    threading.Timer(0.5, nowplaying_send_heartbeat).start()
-
-
-def nowplaying_timeout():
-    global nowplaying_ip
-    if heartbeat_response_received == False:
-        nowplaying_ip = None
-        print "Now Playing user has disconnected."
+    user.emit_id = rooms()[0]
 
 
 @socketio.on('song_end')
 def next_song(message):
-    global queue, now_playing
-    now_playing = None
-    if len(queue) > 0:
-        now_playing = queue[0]
-        if len(queue) >= 2:
-            queue = queue[1:]
-        else:
-            queue = []
-    emit_new_nowplaying_song()
-    emit_update_list()
+    global parties
+
+    party_name = parse_party_from_url(message['party_url'])
+
+    if party_name not in parties:
+        print "ERROR: in next_song, either parse_party_from_url fucked up or something went terribly wrong."
+        return
+
+    parties[party_name].now_playing = None
+    parties[party_name].update_queue_order()
+    emit_nowplaying(parties[party_name])
+    emit_queue(parties[party_name])
 
 
 #########################################
 # METHODS FOR EMITTING MESSAGES TO CLIENTS
 #########################################
 
-def emit_update_list():
-    global users
-
-    # emit the lsit to each user individually
-    for user in users:
-        queue_json = get_queue_json(user.user_id)
+def emit_queue(party):
+    # emit the queue to each user individually
+    for user_id, user in party.users.iteritems():
+        queue_json = party.get_queue_json(user_id)
         print "Emitting a list update: # of songs=", len(queue_json)
         socketio.emit('update_list',
                       {
                           "queue": queue_json
-                      },room=user.room_id)
+                      },room=user.emit_id)
 
-def emit_now_playing_song_title():
-    if now_playing is not None:
-        socketio.emit('now_playing_song_title', now_playing.get_json(),broadcast=True)
-    else:
-        socketio.emit('now_playing_song_title', None,broadcast=True)
 
-def emit_new_nowplaying_song():
-    if now_playing is not None:
-        socketio.emit('new_song', now_playing.get_json(),broadcast=True)
+def emit_nowplaying(party):
+    for user_id, user in party.users.iteritems():
+        if party.now_playing is not None:
+            socketio.emit('new_song', party.now_playing.get_json(), room=user.emit_id)
+        else:
+            socketio.emit('new_song', None, room=user.emit_id)
+
+
+#########################################
+# HELPER METHODS
+#########################################
+
+def init_socket_event(message, source):
+    global parties
+
+    party_name = parse_party_from_url(message['party_url'])
+    user_id = request.cookies.get('user_id')
+    if error_check(party_name, user_id, source):
+        return None, None, True
     else:
-        socketio.emit('new_song', None,broadcast=True)
+        return parties[party_name], parties[party_name].users[user_id], False
+
+
+def parse_party_from_url(party_url):
+    # Wilson's going to castrate me when he sees that I didn't use a regex lel
+    # basically this avoids HTML anchors, then removes trailing slashes, then splits on slashes and returns the last item
+    # we should probably rewrite this (or find a better way of getting the party_name than sending the url over from the frontside)
+    return party_url.split('#')[0].rstrip('/').split('/')[-1]
+
+
+def error_check(party_name, user_id, source):
+    global parties
+
+    if party_name not in parties:
+        print "ERROR: party_name not found in function: " + source + ". Leaving function early."
+        return True
+    if user_id not in parties[party_name].users:
+        print "ERROR: user_id not found in function: " + source + ". Leaving function early."
+        return True
+    return False
 
 
 #########################################
