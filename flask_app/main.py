@@ -1,4 +1,5 @@
 import threading
+import traceback
 
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO,rooms
@@ -6,32 +7,30 @@ from flask_socketio import SocketIO,rooms
 from Core import Song, User, Party, search_youtube
 from sessions import *
 
-
-#########################################
-# ~~~~~~~~~~~~~STRUCTURE~~~~~~~~~~~~~~~ #
-#   Client:
-#       user_id (cookie)
-#       party_name (url)
-#   Server:
-#       parties (party_name to Party obj)
-#           Party
-#               party_name
-#               users (user_id to User obj)
-#                   User
-#                       user_id
-#                       emit_id
-#               hosts
-#               queue
-#                   Song
-#                       title
-#                       url
-#                       upvotes
-#                           user_id
-#                       downvotes
-#                           user_id
-#
-#########################################
-
+"""
+STRUCTURE:
+    Client:
+        user_id (cookie)
+        party_name (url)
+    Server:
+        parties (party_name to Party obj)
+            Party
+                party_name
+                users (user_id to User obj)
+                    User
+                        user_id
+                        emit_id
+                hosts
+                queue
+                    Song
+                        title
+                        url
+                        upvotes
+                            user_id
+                        downvotes
+                            user_id
+                now_playing
+"""
 
 parties = {} # global mapping of party names to party objects
 
@@ -93,8 +92,8 @@ def get_party_page(party_name):
 
 @socketio.on('search')
 def handle_search(message):
-    party, user, error = init_socket_event(message, 'handle_search')
-    if error: return
+    party, user, error = init_socket_event(message)
+    return if error
 
     socketio.emit('search_results', {
         "search_results" : search_youtube(message['query'])
@@ -103,26 +102,35 @@ def handle_search(message):
 
 @socketio.on('add')
 def handle_add(message):
-    party, user, error = init_socket_event(message, 'handle_add')
-    if error: return
+    party, user, error = init_socket_event(message)
+    return if error
 
     party.add_song(user, message['song_url'], message['title'])
     emit_queue(party)
 
 
-@socketio.on('vote')
-def handle_vote(message):
-    party, user, error = init_socket_event(message, 'handle_vote')
-    if error: return
+@socketio.on('upvote')
+def handle_upvote(message):
+    party, user, error = init_socket_event(message)
+    return if error
 
-    party.vote(user, message['song_url'], message['dir'])
+    party.upvote_song(user, message['song_url'])
+    emit_queue(party)
+
+
+@socketio.on('downvote')
+def handle_downvote(message):
+    party, user, error = init_socket_event(message)
+    return if error
+
+    party.downvote_song(user, message['song_url'])
     emit_queue(party)
 
 
 @socketio.on('connect')
 def handle_user_connection(message):
-    party, user, error = init_socket_event(message, 'handle_user_connection')
-    if error: return
+    party, user, error = init_socket_event(message)
+    return if error
 
     user.emit_id = rooms()[0]
 
@@ -138,7 +146,7 @@ def next_song(message):
         return
 
     parties[party_name].now_playing = None
-    parties[party_name].update_queue_order()
+    parties[party_name].reorder_queue()
     emit_nowplaying(parties[party_name])
     emit_queue(parties[party_name])
 
@@ -192,11 +200,15 @@ def error_check(party_name, user_id, source):
     global parties
 
     if party_name not in parties:
-        print "ERROR: party_name not found in function: " + source + ". Leaving function early."
+        print "ERROR: party_name not found. Leaving function early."
+        traceback.print_tb(limit=10)
         return True
+        
     if user_id not in parties[party_name].users:
-        print "ERROR: user_id not found in function: " + source + ". Leaving function early."
+        print "ERROR: user_id not found. Leaving function early."
+        traceback.print_tb(limit=10)
         return True
+
     return False
 
 
