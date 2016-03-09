@@ -1,5 +1,5 @@
 """
-ATTRIBUTES:
+PUBLIC ATTRIBUTES:
     party_name
     hosts[user_id]
     users\{user_id: User\}
@@ -7,8 +7,8 @@ ATTRIBUTES:
     queue[Song]
 PUBLIC METHODS:
     add_song(User, song_url, title)
-    handle_upvote(User, song_url)
-    handle_downvote(User, song_url)
+    upvote_song(User, song_url)
+    downvote_song(User, song_url)
     get_queue_json(User)
         returns list of JSON formatted song data
 PRIVATE METHODS:
@@ -35,7 +35,7 @@ class Party:
             self.reorder_queue()
 
 
-    def handle_upvote(self, user, song_url):
+    def upvote_song(self, user, song_url):
         song = next((song for song in queue if song.url == song_url), None)
 
         # check for errors
@@ -54,7 +54,7 @@ class Party:
         self.reorder_queue()
 
 
-    def handle_downvote(self, user, song_url):
+    def downvote_song(self, user, song_url):
         song = next((song for song in queue if song.url == song_url), None)
 
         # check for errors
