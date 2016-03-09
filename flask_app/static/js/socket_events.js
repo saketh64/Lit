@@ -6,11 +6,12 @@ socket.emit('connect',{});
 var urls = [];
 
 /* EVENTS TO BACKEND */
-function add(_title, _url) {
+function add(_title, _song_url) {
     // this is what an 'add' event looks like
     socket.emit('add', {
+        party_url: window.location.href
         title: _title,
-        url: _url,
+        song_url: _song_url,
     });
 }
 
@@ -21,19 +22,21 @@ function search(_query) {
     });
 }
 
-function upvote(_url) {
+function upvote(_song_url) {
     // this is what an upvote event looks like
-    console.log("upvoting "+_url);
+    console.log("upvoting "+_song_url);
     socket.emit('upvote', {
-        url: String(_url)
+        party_url: window.location.href
+        song_url: String(_song_url)
     });
 }
 
-function downvote(_url) {
+function downvote(_song_url) {
     // this is what a downvote event looks like
-    console.log("downvoting "+_url);
+    console.log("downvoting "+_song_url);
     socket.emit('downvote', {
-        url: String(_url)
+        party_url: window.location.href
+        song_url: String(_song_url)
     });
 }
 /* ~~~~~~~~~~~~~~~~~~~~ */
