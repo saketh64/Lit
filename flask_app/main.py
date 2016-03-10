@@ -93,7 +93,7 @@ def get_party_page(party_name):
 @socketio.on('search')
 def handle_search(message):
     party, user, error = init_socket_event(message)
-    return if error
+    if error: return
 
     socketio.emit('search_results', {
         "search_results" : search_youtube(message['query'])
@@ -103,7 +103,7 @@ def handle_search(message):
 @socketio.on('add')
 def handle_add(message):
     party, user, error = init_socket_event(message)
-    return if error
+    if error: return
 
     party.add_song(user, message['song_url'], message['title'])
     emit_queue(party)
@@ -112,7 +112,7 @@ def handle_add(message):
 @socketio.on('upvote')
 def handle_upvote(message):
     party, user, error = init_socket_event(message)
-    return if error
+    if error: return
 
     party.upvote_song(user, message['song_url'])
     emit_queue(party)
@@ -121,7 +121,7 @@ def handle_upvote(message):
 @socketio.on('downvote')
 def handle_downvote(message):
     party, user, error = init_socket_event(message)
-    return if error
+    if error: return
 
     party.downvote_song(user, message['song_url'])
     emit_queue(party)
@@ -130,25 +130,20 @@ def handle_downvote(message):
 @socketio.on('connect')
 def handle_user_connection(message):
     party, user, error = init_socket_event(message)
-    return if error
+    if error: return
 
     user.emit_id = rooms()[0]
 
 
 @socketio.on('song_end')
 def next_song(message):
-    global parties
+    party, user, error = init_socket_event(message)
+    if error: return
 
-    party_name = parse_party_from_url(message['party_url'])
-
-    if party_name not in parties:
-        print "ERROR: in next_song, either parse_party_from_url fucked up or something went terribly wrong."
-        return
-
-    parties[party_name].now_playing = None
-    parties[party_name].reorder_queue()
-    emit_nowplaying(parties[party_name])
-    emit_queue(parties[party_name])
+    party.now_playing = None
+    party.reorder_queue()
+    emit_nowplaying(party)
+    emit_queue(party)
 
 
 #########################################
@@ -203,7 +198,7 @@ def error_check(party_name, user_id, source):
         print "ERROR: party_name not found. Leaving function early."
         traceback.print_tb(limit=10)
         return True
-        
+
     if user_id not in parties[party_name].users:
         print "ERROR: user_id not found. Leaving function early."
         traceback.print_tb(limit=10)

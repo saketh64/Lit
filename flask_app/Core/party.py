@@ -1,3 +1,5 @@
+from user import User
+
 """
 PUBLIC ATTRIBUTES:
     party_name
@@ -25,7 +27,7 @@ class Party:
 
 
     def add_song(self, user, song_url, title):
-        if any(song.url == song_url for song in self.queue)
+        if any(song.url == song_url for song in self.queue):
             print "Song has already been added!"
         else:
             print "Adding a new song with title '%s'" % title

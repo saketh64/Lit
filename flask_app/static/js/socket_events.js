@@ -1,7 +1,7 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 
-socket.emit('connect',{});
+socket.emit('connect', {party_url: window.location.href});
 
 var urls = [];
 
@@ -9,7 +9,7 @@ var urls = [];
 function add(_title, _song_url) {
     // this is what an 'add' event looks like
     socket.emit('add', {
-        party_url: window.location.href
+        party_url: window.location.href,
         title: _title,
         song_url: _song_url,
     });
@@ -26,7 +26,7 @@ function upvote(_song_url) {
     // this is what an upvote event looks like
     console.log("upvoting "+_song_url);
     socket.emit('upvote', {
-        party_url: window.location.href
+        party_url: window.location.href,
         song_url: String(_song_url)
     });
 }
@@ -35,7 +35,7 @@ function downvote(_song_url) {
     // this is what a downvote event looks like
     console.log("downvoting "+_song_url);
     socket.emit('downvote', {
-        party_url: window.location.href
+        party_url: window.location.href,
         song_url: String(_song_url)
     });
 }
