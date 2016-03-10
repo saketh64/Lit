@@ -63,7 +63,7 @@ function progress(percent, $element) {
 
 function onPlayerStateChange(event) {
 	if (event.data == 0) {
-		socket.emit('song_end', {});
+		socket.emit('song_end', {party_url: window.location.href});
 	}
 
   if (event.data == YT.PlayerState.PLAYING) {

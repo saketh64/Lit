@@ -1,7 +1,6 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-
-socket.emit('connect', {party_url: window.location.href});
+socket.emit('on_connect', {party_url: window.location.href});
 
 var urls = [];
 
@@ -18,6 +17,7 @@ function add(_title, _song_url) {
 function search(_query) {
     // this is what a search event looks like
     socket.emit('search', {
+        party_url: window.location.href,
         query: _query
     });
 }
