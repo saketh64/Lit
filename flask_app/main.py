@@ -103,8 +103,11 @@ def handle_search(message):
     if error: return
 
     results = search_youtube(message[u"query"])
+    # convert to json because apparently we misplaced that line of code
+    # *cough* wilson
+    results_json = [result.__dict__ for result in results]
     socketio.emit('search_results', {
-        "search_results" : results
+        "search_results" : results_json
     }, room=user.emit_id)
 
 
@@ -113,7 +116,13 @@ def handle_add(message):
     party, user, error = init_socket_event(message)
     if error: return
 
-    party.add_song(user, message['song_url'], message['title'])
+    # check if we need to emit a new now_playing song
+    if party.now_playing == None:
+        party.add_song(user, message['song_url'], message['title'])
+        emit_nowplaying(party)
+    else:
+        party.add_song(user, message['song_url'], message['title'])
+
     emit_queue(party)
 
 
@@ -140,7 +149,10 @@ def handle_user_connection(message):
     party, user, error = init_socket_event(message)
     if error: return
 
+    print "on_connect"
     user.emit_id = rooms()[0]
+    emit_nowplaying(party)
+    emit_queue(party)
 
 
 @socketio.on('song_end')

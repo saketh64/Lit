@@ -1,5 +1,7 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
+socket.emit('on_connect', {party_url: window.location.href});
+
 socket.on('heartbeat_to_client', function (message) {
   socket.emit('heartbeat_to_server', {});
 });

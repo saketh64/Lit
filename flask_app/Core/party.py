@@ -1,4 +1,5 @@
 from user import User
+from song import Song
 
 """
 PUBLIC ATTRIBUTES:
@@ -38,7 +39,7 @@ class Party:
 
 
     def upvote_song(self, user, song_url):
-        song = next((song for song in queue if song.url == song_url), None)
+        song = next((song for song in self.queue if song.url == song_url), None)
 
         # check for errors
         if song == None:
@@ -57,7 +58,7 @@ class Party:
 
 
     def downvote_song(self, user, song_url):
-        song = next((song for song in queue if song.url == song_url), None)
+        song = next((song for song in self.queue if song.url == song_url), None)
 
         # check for errors
         if song == None:
@@ -76,18 +77,16 @@ class Party:
 
 
     def get_queue_json(self, user):
-        """
-        user is used to give the user THEIR particular vote data
-        :return: a JSON object to send to the client
-        """
+        # user is used to give the user THEIR particular vote data
         return [song.get_json(user.user_id) for song in self.queue]
+
 
     def reorder_queue(self):
         # if needed, update now_playing BEFORE reordering the queue
         # sacrifices accuracy for user experience
         # (it would be jarring for the user if the song ended and the "up next" song didn't play next
         # 99% of the time it won't matter
-        if now_playing == None:
-            now_playing = queue.pop(0)
+        if self.now_playing == None:
+            self.now_playing = self.queue.pop(0)
 
         self.queue.sort(key=lambda song: song.score(), reverse=True)
