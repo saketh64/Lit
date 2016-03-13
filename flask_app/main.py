@@ -3,9 +3,9 @@ import traceback
 import sys
 
 from flask import Flask, render_template, request, make_response
-from flask_socketio import SocketIO,rooms
+from flask_socketio import SocketIO, rooms, join_room
 
-from Core import Song, User, Party, search_youtube
+from Core import Song, Party, search_youtube
 from sessions import *
 
 """
@@ -17,10 +17,7 @@ STRUCTURE:
         parties (party_name to Party obj)
             Party
                 party_name
-                users (user_id to User obj)
-                    User
-                        user_id
-                        emit_id
+                users
                 hosts
                 queue
                     Song
@@ -76,7 +73,7 @@ def get_party_page(party_name):
 
     # add user to party if needed
     if user_id not in party.users:
-        party.users[user_id] = User(user_id)
+        party.users.append(user_id)
 
     # render host or user page
     if user_id in party.hosts:
@@ -86,7 +83,7 @@ def get_party_page(party_name):
             now_playing_title = "No song is playing."
         else:
             now_playing_title = party.now_playing.title
-        resp = make_response(render_template('guest.html',queue=party.get_queue_json(party.users[user_id]),now_playing_title=now_playing_title))
+        resp = make_response(render_template('guest.html',queue=party.get_queue_json(user_id),now_playing_title=now_playing_title))
 
     if new_user:
         resp.set_cookie('user_id', user_id)
@@ -99,7 +96,7 @@ def get_party_page(party_name):
 
 @socketio.on('search')
 def handle_search(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
     results = search_youtube(message[u"query"])
@@ -108,56 +105,55 @@ def handle_search(message):
     results_json = [result.__dict__ for result in results]
     socketio.emit('search_results', {
         "search_results" : results_json
-    }, room=user.emit_id)
+    }, room=get_room(party, user_id))
 
 
 @socketio.on('add')
 def handle_add(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
     # check if we need to emit a new now_playing song
     if party.now_playing == None:
-        party.add_song(user, message['song_url'], message['title'])
+        party.add_song(user_id, message['song_url'], message['title'])
         emit_nowplaying(party)
     else:
-        party.add_song(user, message['song_url'], message['title'])
+        party.add_song(user_id, message['song_url'], message['title'])
 
     emit_queue(party)
 
 
 @socketio.on('upvote')
 def handle_upvote(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
-    party.upvote_song(user, message['song_url'])
+    party.upvote_song(user_id, message['song_url'])
     emit_queue(party)
 
 
 @socketio.on('downvote')
 def handle_downvote(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
-    party.downvote_song(user, message['song_url'])
+    party.downvote_song(user_id, message['song_url'])
     emit_queue(party)
 
 
 @socketio.on('on_connect')
 def handle_user_connection(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
-    print "on_connect"
-    user.emit_id = rooms()[0]
-    emit_nowplaying(party)
+    print "on_connect: " + party.party_name + " - " + user_id
+    join_room(get_room(party, user_id))
     emit_queue(party)
 
 
 @socketio.on('song_end')
 def next_song(message):
-    party, user, error = init_socket_event(message)
+    party, user_id, error = init_socket_event(message)
     if error: return
 
     party.now_playing = None
@@ -172,26 +168,32 @@ def next_song(message):
 
 def emit_queue(party):
     # emit the queue to each user individually
-    for user_id, user in party.users.iteritems():
-        queue_json = party.get_queue_json(user)
+    for user_id in party.users:
+        queue_json = party.get_queue_json(user_id)
         print "Emitting a list update: # of songs=", len(queue_json)
         socketio.emit('update_list',
                       {
                           "queue": queue_json
-                      },room=user.emit_id)
+                      },room=get_room(party, user_id))
 
 
 def emit_nowplaying(party):
-    for user_id, user in party.users.iteritems():
+    for user_id in party.users:
         if party.now_playing is not None:
-            socketio.emit('new_song', party.now_playing.get_json(), room=user.emit_id)
+            socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
         else:
-            socketio.emit('new_song', None, room=user.emit_id)
+            socketio.emit('new_song', None, room=get_room(party, user_id))
 
 
 #########################################
 # HELPER METHODS
 #########################################
+
+# this is basically the old emit_id
+# it's in the format "partyname_userid"
+def get_room(party, user_id):
+    return party.party_name + "_" + user_id
+
 
 def init_socket_event(message):
     global parties
@@ -201,7 +203,7 @@ def init_socket_event(message):
     if error_check(party_name, user_id):
         return None, None, True
     else:
-        return parties[party_name], parties[party_name].users[user_id], False
+        return parties[party_name], user_id, False
 
 
 def parse_party_from_url(party_url):
