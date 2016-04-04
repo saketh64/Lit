@@ -14,7 +14,7 @@ body {
 	background-image: url("../img/host_user_header_bg1.png");
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-size: 100%;
+	background-size: cover;
 	position: relative;
 }
 
