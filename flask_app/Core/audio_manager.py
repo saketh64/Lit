@@ -1,3 +1,15 @@
+"""
+audio_manager.py
+
+This module is used to queue/download audio from Youtube to the Lit server.
+
+It uses pafy for the Youtube audio downloads.
+
+'set_on_download_completed' should be called from main.py to attach an event for when a song is
+finished downloading - we will notify certain nowplaying sessions that their song is ready, etc.
+"""
+
+
 import pafy
 import os
 from threading import Thread
