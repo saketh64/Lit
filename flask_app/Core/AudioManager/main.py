@@ -1,5 +1,6 @@
 import pafy
 import os
+from threading import Thread
 
 BASE_URL = "https://www.youtube.com/watch?v=%s"
 STORAGE_PATH = "flask_app/static/music/%s.mp3"
@@ -10,6 +11,15 @@ class SongState:
     NONE = 2
 
 queue = []
+
+def _(url):
+    pass
+
+on_download_completed = _
+
+def set_on_download_completed(event_handler):
+    global on_download_completed
+    on_download_completed = event_handler
 
 def get_id_from_url(url):
     ID_idx = url.index("watch?v=")+8
@@ -25,8 +35,10 @@ def download_song(url):
     stream = video.getbestaudio()
     stream.download(STORAGE_PATH % id)
     print "FINISHING",id
+    on_download_completed(url)
 
-def queue_song(url):
+def _queue_song(url):
+    """ this is called from a background thread """
     id = get_id_from_url(url)
     print "APPENDING",id
     # if queue is empty, download the song
@@ -37,6 +49,10 @@ def queue_song(url):
         on_downloader_ready()
     else:
         queue.append(url)
+
+def queue_song(url):
+    t = Thread(target=_queue_song,args=(url,))
+    t.start()
 
 def on_downloader_ready():
     if len(queue) > 0:
@@ -60,7 +76,7 @@ def get_song_state(url):
     else:
         return SongState.QUEUED
 
-
+'''
 #########################
 #       TESTING         #
 #########################
@@ -82,3 +98,4 @@ urls = ["https://www.youtube.com/watch?v=LkWpURhvN3E",
 for u in urls:
     t = Thread(target=test,args=(u,))
     t.start()
+'''
