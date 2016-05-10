@@ -1,4 +1,5 @@
-import threading
+import logging
+from logging.handlers import RotatingFileHandler
 import traceback
 import sys
 
@@ -42,6 +43,24 @@ f.close()
 socketio = SocketIO(app)
 
 
+
+
+#########################################
+# Initialize logging stuff
+#########################################
+
+logger = logging.getLogger('Lit')
+logger.setLevel(logging.DEBUG)
+
+handler = RotatingFileHandler('out.log', maxBytes=1000000, backupCount=1)
+# create formatter
+formatter = logging.Formatter("%(levelname)s\t- %(message)s")
+# add formatter to handler
+handler.setFormatter(formatter)
+handler.setLevel(logging.DEBUG)
+logger.addHandler(handler)
+
+
 #########################################
 # ENDPOINTS
 #########################################
@@ -49,6 +68,8 @@ socketio = SocketIO(app)
 @app.route('/')
 def get_landing_page():
     return render_template('index.html')
+
+
 
 
 @app.route('/<party_name>')
@@ -61,12 +82,13 @@ def get_party_page(party_name):
     if user_id == None:
         user_id = get_random_user_id()
         new_user = True
-        print "NEW connection, user_id=", user_id
+        logger.info("NEW connection, user_id = %s" % user_id)
     else:
-        print "Repeated connection, user_id=", user_id
+        logger.info("Repeated connection, user_id = %s" % user_id)
 
     # make new party if needed
     if party_name not in parties:
+        logger.info("Creating a new party with name '%s'" % party_name)
         parties[party_name] = Party(party_name, user_id)
 
     party = parties[party_name]
@@ -146,7 +168,7 @@ def handle_user_connection(message):
     party, user_id, error = init_socket_event(message)
     if error: return
 
-    print "on_connect: " + party.party_name + " - " + user_id
+    logger.info("on_connect: %s - %s" % (party.party_name, user_id))
     join_room(get_room(party, user_id))
     emit_queue(party)
 
@@ -170,7 +192,7 @@ def emit_queue(party):
     # emit the queue to each user individually
     for user_id in party.users:
         queue_json = party.get_queue_json(user_id)
-        print "Emitting a list update: # of songs=", len(queue_json)
+        logger.info("Emitting a list update: # of songs = %d" % len(queue_json))
         socketio.emit('update_list',
                       {
                           "queue": queue_json
@@ -178,6 +200,7 @@ def emit_queue(party):
 
 
 def emit_nowplaying(party):
+    logger.info("Emitting nowplaying for party: %s" % party.party_name)
     for user_id in party.users:
         if party.now_playing is not None:
             socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
@@ -217,8 +240,8 @@ def error_check(party_name, user_id):
     global parties
 
     if party_name not in parties:
-        print "ERROR: party_name not found. Leaving function early."
-        # this whole thing is needed to print the stack trace
+        logger.error("party_name not found. Leaving function early.")
+        # this whole thing is needed to logger.info(the stack trace
         try:
             raise Exception
         except Exception:
@@ -226,7 +249,7 @@ def error_check(party_name, user_id):
         return True
 
     if user_id not in parties[party_name].users:
-        print "ERROR: user_id not found. Leaving function early."
+        logger.error("user_id not found. Leaving function early.")
         try:
             raise Exception
         except Exception:
@@ -241,4 +264,5 @@ def error_check(party_name, user_id):
 #########################################
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', debug=True)
+    logger.info("Starting app")
+    socketio.run(app, host='0.0.0.0')

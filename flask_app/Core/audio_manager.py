@@ -9,10 +9,12 @@ It uses pafy for the Youtube audio downloads.
 finished downloading - we will notify certain nowplaying sessions that their song is ready, etc.
 """
 
-
 import pafy
 import os
+import logging
 from threading import Thread
+
+logger = logging.getLogger("Lit")
 
 BASE_URL = "https://www.youtube.com/watch?v=%s"
 STORAGE_PATH = "flask_app/static/music/%s.mp3"
@@ -39,20 +41,20 @@ def get_id_from_url(url):
 
 def download_song(url):
     id = get_id_from_url(url)
-    print "DOWNLOADING",id
+    logger.info("Downloading song with ID: %s" % id)
     if get_song_state(url) == SongState.DOWNLOADED:
-        print "SKIPPING",id
+        logger.info("Skipping download of song with ID: %s" % id)
         return
     video = pafy.new(url)
     stream = video.getbestaudio()
     stream.download(STORAGE_PATH % id)
-    print "FINISHING",id
+    logger.info("Finishing download of song with ID: %s" % id)
     on_download_completed(url)
 
 def _queue_song(url):
     """ this is called from a background thread """
     id = get_id_from_url(url)
-    print "APPENDING",id
+    logger.info("Queueing song with ID: %s" % id)
     # if queue is empty, download the song
     if len(queue) == 0:
         queue.append(url)
