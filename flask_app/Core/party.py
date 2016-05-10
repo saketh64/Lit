@@ -7,6 +7,7 @@ PUBLIC ATTRIBUTES:
     users[user_id]
     Song now_playing
     queue[Song]
+    bool pending_download
 PUBLIC METHODS:
     add_song(user_id, song_url, title)
     upvote_song(user_id, song_url)
@@ -24,6 +25,7 @@ class Party:
         self.users = [host_id]
         self.now_playing = None
         self.queue = []
+        self.pending_download = False
 
 
     def add_song(self, user_id, song_url, title):

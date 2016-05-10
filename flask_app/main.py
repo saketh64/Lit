@@ -6,7 +6,7 @@ import sys
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO, rooms, join_room
 
-from Core import Song, Party, search_youtube
+from Core import Song, Party, search_youtube,audio_manager
 from sessions import *
 
 """
@@ -142,6 +142,9 @@ def handle_add(message):
     else:
         party.add_song(user_id, message['song_url'], message['title'])
 
+    # Download the audio for the new song.
+    audio_manager.queue_song(url=message['song_url'])
+
     emit_queue(party)
 
 
@@ -171,6 +174,13 @@ def handle_user_connection(message):
     logger.info("on_connect: %s - %s" % (party.party_name, user_id))
     join_room(get_room(party, user_id))
     emit_queue(party)
+
+@socketio.on('nowplaying_connect')
+def handle_nowplaying_connection(message):
+    party, user_id, error = init_socket_event(message)
+    if error: return
+
+    emit_nowplaying(party)
 
 
 @socketio.on('song_end')
@@ -203,7 +213,10 @@ def emit_nowplaying(party):
     logger.info("Emitting nowplaying for party: %s" % party.party_name)
     for user_id in party.users:
         if party.now_playing is not None:
-            socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
+            if audio_manager.get_song_state(party.now_playing.url) == audio_manager.SongState.DOWNLOADED:
+                socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
+            else:
+                party.pending_download = True
         else:
             socketio.emit('new_song', None, room=get_room(party, user_id))
 
@@ -258,6 +271,18 @@ def error_check(party_name, user_id):
 
     return False
 
+
+def on_download_completed(url):
+    logger.info("on_download_completed() for %s" % url)
+    for party in parties.values():
+        if party.now_playing is not None:
+            if party.now_playing.url == url and party.pending_download is True:
+                # alert stuff
+                emit_nowplaying(party)
+                party.pending_download = False
+
+
+audio_manager.set_on_download_completed(on_download_completed)
 
 #########################################
 # MAIN ENTRY POINT OF FLASK APP
