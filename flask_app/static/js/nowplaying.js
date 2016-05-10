@@ -1,112 +1,102 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.emit('on_connect', {party_url: window.location.href});
-
-socket.on('heartbeat_to_client', function (message) {
-  socket.emit('heartbeat_to_server', {});
+socket.emit('on_connect', {
+    party_url: window.location.href
+});
+socket.emit('nowplaying_connect', {
+    party_url: window.location.href
 });
 
-// Inject YouTube API script
-var tag = document.createElement('script');
-tag.src = "//www.youtube.com/player_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+socket.on('heartbeat_to_client', function (message) {
+    socket.emit('heartbeat_to_server', {});
+});
 
 $(".button-row").css("margin-top", new_height());
 
-function new_height () {
-	return $(window).height()/4;
+function new_height() {
+    return $(window).height() / 4;
 }
 
-var player;
+// This will be an HTML5 Audio object (will NOT be in the DOM)
+var audio;
+var is_playing = false;
 
-function onYouTubePlayerAPIReady() {
-  // create the global player from the specific iframe (#video)
-  player = new YT.Player('video', {
-    events: {
-      // call this function when player is ready to use
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
-}
+var progress_bar;
 
-var play = false;
-function onPlayerReady(event) {
+$(document).ready(function () {
+    // bind events for play/pause click
+    var playButton = document.getElementById("play-button");
+    playButton.addEventListener("click", playpause_click);
 
-  // bind events
-  var playButton = document.getElementById("play-button");
-  playButton.addEventListener("click", function() {
+    progress_bar = $("#progressBar");
+});
 
-  	if(play == true)
-  	{
-  		$("#play-button").css("background-image", "url(static/img/pause.png)");
-  		player.playVideo();
-  	}
-  	else
-  	{
-  		$("#play-button").css("background-image", "url(static/img/play.png)");
-  		player.pauseVideo();
-  	}
-
-  	play = !play;
-  });
-
-  player.mute();
-}
-
-function progress(percent, $element) {
-  var progressBarWidth = percent * $element.width() / 100;
-
-// $element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
-
-  $element.find('div').animate({ width: progressBarWidth });
-}
-
-function onPlayerStateChange(event) {
-	if (event.data == 0) {
-		socket.emit('song_end', {party_url: window.location.href});
-	}
-
-  if (event.data == YT.PlayerState.PLAYING) {
-
-      $('#progressBar').show();
-      var playerTotalTime = player.getDuration();
-
-      mytimer = setInterval(function() {
-        var playerCurrentTime = player.getCurrentTime();
-
-        var playerTimeDifference = (playerCurrentTime / playerTotalTime) * 100;
-
-
-        progress(playerTimeDifference, $('#progressBar'));
-      }, 500);
+function playpause_click() {
+    if (is_playing == true) {
+        $("#play-button").css("background-image", "url(static/img/pause.png)");
+        audio.play();
     } else {
-
-      clearTimeout(mytimer);
+        $("#play-button").css("background-image", "url(static/img/play.png)");
+        audio.pause();
     }
+
+    is_playing = !is_playing;
 }
 
+function progress(percent) {
+    var progressBarWidth = percent * progress_bar.width() / 100;
 
- socket.on('new_song', function (message){
-   if (message)
- 	{
-    console.log(message["url"]);
-    var contents = message["url"].split('/watch?v=');
-    var newsrc = contents[0] + "/embed/" + contents[1] + "?autoplay=1";
-    player.loadVideoByUrl(newsrc);
-    player.unMute();
-    $('.current_song_title').text(message["title"]);
- 	}
- 	else
- 	{
- 			$('.current_song_title').text("No song is playing");
- 	}
+    progress_bar.find('div').animate({
+        width: progressBarWidth
+    });
+}
 
-  });
+socket.on('new_song', function (message) {
+    if (message) {
+        console.log(message["id"]);
+        var id = message["id"];
 
- $('body').keydown(function(e){
-      if (e.keyCode == 39) {
-        player.seekTo(10000);
-      }
- })
+        var audio_file_path = "/static/music/" + message["id"] + ".mp3";
+
+        audio = new Audio(audio_file_path);
+        audio.ontimeupdate = progress_update;
+        audio.onended = song_ended;
+        audio.play();
+        $('#progressBar').show();
+
+        $('.current_song_title').text(message["title"]);
+    } else {
+        $('.current_song_title').text("No song is playing");
+    }
+
+});
+
+var progress_update = function () {
+    var current_time = audio.currentTime;
+    var total_time = audio.duration;
+    var progress_pct = 100 * (current_time / total_time);
+    console.log(current_time + "/" + total_time + " = " + progress_pct);
+    progress(progress_pct);
+}
+
+var song_ended = function () {
+    // probably just needed when debugging, but might as well always call this
+    audio.src = ""
+    audio.ontimeupdate = null;
+    audio.onended = null;
+    audio = null;
+
+    $('#progressBar').hide();
+
+
+    console.log("Emitting 'song_end' event.");
+    socket.emit('song_end', {
+        party_url: window.location.href
+    });
+}
+
+$('body').keydown(function (e) {
+    if (e.keyCode == 32) { // play/pause
+        playpause_click();
+    }
+})
