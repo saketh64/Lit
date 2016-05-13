@@ -1,13 +1,14 @@
-import logging
-from logging.handlers import RotatingFileHandler
 import traceback
 import sys
 
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO, rooms, join_room
 
-from Core import Song, Party, search_youtube,audio_manager
+import logging
+
+from Core import Party, search_youtube,audio_manager, logging_handlers
 from sessions import *
+
 
 """
 STRUCTURE:
@@ -42,23 +43,7 @@ f.close()
 
 socketio = SocketIO(app)
 
-
-
-
-#########################################
-# Initialize logging stuff
-#########################################
-
-logger = logging.getLogger('Lit')
-logger.setLevel(logging.DEBUG)
-
-handler = RotatingFileHandler('out.log', maxBytes=1000000, backupCount=1)
-# create formatter
-formatter = logging.Formatter("%(levelname)s\t- %(message)s")
-# add formatter to handler
-handler.setFormatter(formatter)
-handler.setLevel(logging.DEBUG)
-logger.addHandler(handler)
+logger = logging.getLogger("Lit")
 
 
 #########################################

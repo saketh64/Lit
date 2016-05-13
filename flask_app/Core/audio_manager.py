@@ -11,10 +11,12 @@ finished downloading - we will notify certain nowplaying sessions that their son
 
 import pafy
 import os
-import logging
 from threading import Thread
 
-logger = logging.getLogger("Lit")
+import logging
+
+
+logger = logging.getLogger("AM")
 
 BASE_URL = "https://www.youtube.com/watch?v=%s"
 STORAGE_PATH = "flask_app/static/music/%s.mp3"
