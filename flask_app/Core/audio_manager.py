@@ -29,6 +29,7 @@ class SongState:
 queue = []
 
 def _(url):
+    """Empty placeholder method for on_download_completed event"""
     pass
 
 on_download_completed = _
@@ -54,7 +55,7 @@ def download_song(url):
     on_download_completed(url)
 
 def _queue_song(url):
-    """ this is called from a background thread """
+    """This is called from a background thread, and only from within this module"""
     id = get_id_from_url(url)
     logger.info("Queueing song with ID: %s" % id)
     # if queue is empty, download the song
@@ -89,29 +90,7 @@ def get_song_state(url):
     path = STORAGE_PATH % id
     if os.path.exists(path):
         return SongState.DOWNLOADED
-    else:
+    elif url in queue:
         return SongState.QUEUED
-
-'''
-#########################
-#       TESTING         #
-#########################
-from threading import Thread
-from time import sleep
-from random import random
-
-
-def test(url):
-    sleep(random()*2)
-    queue_song(url)
-
-urls = ["https://www.youtube.com/watch?v=LkWpURhvN3E",
-        "https://www.youtube.com/watch?v=J-vUJx8swoU",
-        "https://www.youtube.com/watch?v=f7plhrsQSEE",
-        "https://www.youtube.com/watch?v=68oooLfnoIw"]
-
-
-for u in urls:
-    t = Thread(target=test,args=(u,))
-    t.start()
-'''
+    else:
+        return SongState.NONE
