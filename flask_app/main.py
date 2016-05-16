@@ -43,7 +43,7 @@ f.close()
 
 socketio = SocketIO(app)
 
-logger = logging.getLogger("Lit")
+logger = logging.getLogger("MainService")
 
 
 #########################################

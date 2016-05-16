@@ -16,7 +16,7 @@ from threading import Thread
 import logging
 
 
-logger = logging.getLogger("AM")
+logger = logging.getLogger("AudioManager")
 
 BASE_URL = "https://www.youtube.com/watch?v=%s"
 STORAGE_PATH = "flask_app/static/music/%s.mp3"
