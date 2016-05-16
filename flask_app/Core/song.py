@@ -1,4 +1,5 @@
 import time
+from audio_manager import get_id_from_url
 
 """
 PUBLIC ATTRIBUTES:
@@ -50,4 +51,6 @@ class Song:
         else:
             result["upvote"] = self.upvotes
             result["downvote"] = self.downvotes
+
+        result["id"] = get_id_from_url(self.url)
         return result

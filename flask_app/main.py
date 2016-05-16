@@ -1,12 +1,14 @@
-import threading
 import traceback
 import sys
 
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO, rooms, join_room
 
-from Core import Song, Party, search_youtube
+import logging
+
+from Core import Party, search_youtube,audio_manager, logging_handlers
 from sessions import *
+
 
 """
 STRUCTURE:
@@ -41,6 +43,8 @@ f.close()
 
 socketio = SocketIO(app)
 
+logger = logging.getLogger("MainService")
+
 
 #########################################
 # ENDPOINTS
@@ -49,6 +53,8 @@ socketio = SocketIO(app)
 @app.route('/')
 def get_landing_page():
     return render_template('index.html')
+
+
 
 
 @app.route('/<party_name>')
@@ -61,12 +67,13 @@ def get_party_page(party_name):
     if user_id == None:
         user_id = get_random_user_id()
         new_user = True
-        print "NEW connection, user_id=", user_id
+        logger.info("NEW connection, user_id = %s" % user_id)
     else:
-        print "Repeated connection, user_id=", user_id
+        logger.info("Repeated connection, user_id = %s" % user_id)
 
     # make new party if needed
     if party_name not in parties:
+        logger.info("Creating a new party with name '%s'" % party_name)
         parties[party_name] = Party(party_name, user_id)
 
     party = parties[party_name]
@@ -120,6 +127,9 @@ def handle_add(message):
     else:
         party.add_song(user_id, message['song_url'], message['title'])
 
+    # Download the audio for the new song.
+    audio_manager.queue_song(url=message['song_url'])
+
     emit_queue(party)
 
 
@@ -146,9 +156,16 @@ def handle_user_connection(message):
     party, user_id, error = init_socket_event(message)
     if error: return
 
-    print "on_connect: " + party.party_name + " - " + user_id
+    logger.info("on_connect: %s - %s" % (party.party_name, user_id))
     join_room(get_room(party, user_id))
     emit_queue(party)
+
+@socketio.on('nowplaying_connect')
+def handle_nowplaying_connection(message):
+    party, user_id, error = init_socket_event(message)
+    if error: return
+
+    emit_nowplaying(party)
 
 
 @socketio.on('song_end')
@@ -170,7 +187,7 @@ def emit_queue(party):
     # emit the queue to each user individually
     for user_id in party.users:
         queue_json = party.get_queue_json(user_id)
-        print "Emitting a list update: # of songs=", len(queue_json)
+        logger.info("Emitting a list update: # of songs = %d" % len(queue_json))
         socketio.emit('update_list',
                       {
                           "queue": queue_json
@@ -178,9 +195,13 @@ def emit_queue(party):
 
 
 def emit_nowplaying(party):
+    logger.info("Emitting nowplaying for party: %s" % party.party_name)
     for user_id in party.users:
         if party.now_playing is not None:
-            socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
+            if audio_manager.get_song_state(party.now_playing.url) == audio_manager.SongState.DOWNLOADED:
+                socketio.emit('new_song', party.now_playing.get_json(), room=get_room(party, user_id))
+            else:
+                party.pending_download = True
         else:
             socketio.emit('new_song', None, room=get_room(party, user_id))
 
@@ -217,8 +238,8 @@ def error_check(party_name, user_id):
     global parties
 
     if party_name not in parties:
-        print "ERROR: party_name not found. Leaving function early."
-        # this whole thing is needed to print the stack trace
+        logger.error("party_name not found. Leaving function early.")
+        # this whole thing is needed to logger.info(the stack trace
         try:
             raise Exception
         except Exception:
@@ -226,7 +247,7 @@ def error_check(party_name, user_id):
         return True
 
     if user_id not in parties[party_name].users:
-        print "ERROR: user_id not found. Leaving function early."
+        logger.error("user_id not found. Leaving function early.")
         try:
             raise Exception
         except Exception:
@@ -236,9 +257,22 @@ def error_check(party_name, user_id):
     return False
 
 
+def on_download_completed(url):
+    logger.info("on_download_completed() for %s" % url)
+    for party in parties.values():
+        if party.now_playing is not None:
+            if party.now_playing.url == url and party.pending_download is True:
+                # alert stuff
+                emit_nowplaying(party)
+                party.pending_download = False
+
+
+audio_manager.set_on_download_completed(on_download_completed)
+
 #########################################
 # MAIN ENTRY POINT OF FLASK APP
 #########################################
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', debug=True)
+    logger.info("Starting app")
+    socketio.run(app, host='0.0.0.0')

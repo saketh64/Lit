@@ -7,6 +7,7 @@ PUBLIC ATTRIBUTES:
     users[user_id]
     Song now_playing
     queue[Song]
+    bool pending_download
 PUBLIC METHODS:
     add_song(user_id, song_url, title)
     upvote_song(user_id, song_url)
@@ -24,6 +25,7 @@ class Party:
         self.users = [host_id]
         self.now_playing = None
         self.queue = []
+        self.pending_download = False
 
 
     def add_song(self, user_id, song_url, title):
@@ -85,7 +87,9 @@ class Party:
         # sacrifices accuracy for user experience
         # (it would be jarring for the user if the song ended and the "up next" song didn't play next
         # 99% of the time it won't matter
-        if self.now_playing == None:
+
+
+        if self.now_playing == None and len(self.queue) > 0:
             self.now_playing = self.queue.pop(0)
 
         self.queue.sort(key=lambda song: song.score(), reverse=True)
